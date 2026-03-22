@@ -1,0 +1,40 @@
+name: Bootstrap Flutter Shell
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Generate Flutter project shell
+        run: |
+          flutter --version
+          flutter create . \
+            --project-name scratchless \
+            --org com.cube23 \
+            --platforms=android
+
+      - name: Commit generated shell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Bootstrap Flutter shell"
+            git push origin HEAD:main
+          fi
