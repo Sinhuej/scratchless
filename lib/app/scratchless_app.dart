@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/models/purchase_log.dart';
+import '../core/storage/app_storage.dart';
 import '../features/home/home_shell.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import 'app_theme.dart';
@@ -13,6 +14,7 @@ class ScratchLessApp extends StatefulWidget {
 }
 
 class _ScratchLessAppState extends State<ScratchLessApp> {
+  bool _isLoading = true;
   bool _isOnboarded = false;
   DateTime? _startedAt;
 
@@ -21,7 +23,13 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   String _goal = 'Spend less';
 
   int _urgesDefeated = 0;
-  final List<PurchaseLog> _logs = <PurchaseLog>[];
+  List<PurchaseLog> _logs = <PurchaseLog>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedState();
+  }
 
   double get _monthlySpendEstimate {
     return _frequencyPerWeek * _averageSpend * 4.33;
@@ -43,10 +51,51 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     final reference = _logs.isEmpty ? _startedAt! : _logs.first.createdAt;
     final now = DateTime.now();
 
-    final referenceDay = DateTime(reference.year, reference.month, reference.day);
-    final today = DateTime(now.year, now.month, now.day);
+    final referenceDay = DateTime(
+      reference.year,
+      reference.month,
+      reference.day,
+    );
+    final today = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
 
     return today.difference(referenceDay).inDays;
+  }
+
+  Future<void> _loadSavedState() async {
+    final stored = await AppStorage.load();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = false;
+      _isOnboarded = stored.isOnboarded;
+      _startedAt = stored.startedAt;
+      _frequencyPerWeek = stored.frequencyPerWeek;
+      _averageSpend = stored.averageSpend;
+      _goal = stored.goal;
+      _urgesDefeated = stored.urgesDefeated;
+      _logs = stored.logs;
+    });
+  }
+
+  Future<void> _persistState() async {
+    await AppStorage.save(
+      StoredAppState(
+        isOnboarded: _isOnboarded,
+        startedAt: _startedAt,
+        frequencyPerWeek: _frequencyPerWeek,
+        averageSpend: _averageSpend,
+        goal: _goal,
+        urgesDefeated: _urgesDefeated,
+        logs: _logs,
+      ),
+    );
   }
 
   void _completeOnboarding(OnboardingResult result) {
@@ -57,25 +106,31 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _averageSpend = result.averageSpend;
       _goal = result.goal;
     });
+
+    _persistState();
   }
 
   void _logPurchase(double amount, String? note) {
     setState(() {
-      _logs.insert(
-        0,
+      _logs = <PurchaseLog>[
         PurchaseLog(
           createdAt: DateTime.now(),
           amount: amount,
           note: note,
         ),
-      );
+        ..._logs,
+      ];
     });
+
+    _persistState();
   }
 
   void _completeUrgeSession() {
     setState(() {
       _urgesDefeated += 1;
     });
+
+    _persistState();
   }
 
   @override
@@ -84,23 +139,38 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       title: 'ScratchLess',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark(),
-      home: _isOnboarded
-          ? HomeShell(
-              currentStreakDays: _currentStreakDays,
-              urgesDefeated: _urgesDefeated,
-              frequencyPerWeek: _frequencyPerWeek,
-              averageSpend: _averageSpend,
-              estimatedCashKept: _estimatedCashKept,
-              totalSpent: _totalSpent,
-              monthlySpendEstimate: _monthlySpendEstimate,
-              goal: _goal,
-              logs: _logs,
-              onLogPurchase: _logPurchase,
-              onCompleteUrgeSession: _completeUrgeSession,
-            )
-          : OnboardingScreen(
-              onComplete: _completeOnboarding,
-            ),
+      home: _isLoading
+          ? const _LoadingScreen()
+          : _isOnboarded
+              ? HomeShell(
+                  currentStreakDays: _currentStreakDays,
+                  urgesDefeated: _urgesDefeated,
+                  frequencyPerWeek: _frequencyPerWeek,
+                  averageSpend: _averageSpend,
+                  estimatedCashKept: _estimatedCashKept,
+                  totalSpent: _totalSpent,
+                  monthlySpendEstimate: _monthlySpendEstimate,
+                  goal: _goal,
+                  logs: _logs,
+                  onLogPurchase: _logPurchase,
+                  onCompleteUrgeSession: _completeUrgeSession,
+                )
+              : OnboardingScreen(
+                  onComplete: _completeOnboarding,
+                ),
+    );
+  }
+}
+
+class _LoadingScreen extends StatelessWidget {
+  const _LoadingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }
