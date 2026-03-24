@@ -50,9 +50,8 @@ class AppStorage {
       final prefs = await SharedPreferences.getInstance();
 
       final startedAtRaw = prefs.getString(_startedAtKey);
-      final startedAt = startedAtRaw == null
-          ? null
-          : DateTime.tryParse(startedAtRaw);
+      final startedAt =
+          startedAtRaw == null ? null : DateTime.tryParse(startedAtRaw);
 
       final rawLogs = prefs.getStringList(_logsKey) ?? <String>[];
       final logs = rawLogs.map((raw) {
@@ -91,22 +90,9 @@ class AppStorage {
     await prefs.setString(_goalKey, state.goal);
     await prefs.setInt(_urgesDefeatedKey, state.urgesDefeated);
 
-    final encodedLogs = state.logs
-        .map((log) => jsonEncode(log.toJson()))
-        .toList();
+    final encodedLogs =
+        state.logs.map((log) => jsonEncode(log.toJson())).toList();
 
     await prefs.setStringList(_logsKey, encodedLogs);
-  }
-
-  static Future<void> clear() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.remove(_isOnboardedKey);
-    await prefs.remove(_startedAtKey);
-    await prefs.remove(_frequencyPerWeekKey);
-    await prefs.remove(_averageSpendKey);
-    await prefs.remove(_goalKey);
-    await prefs.remove(_urgesDefeatedKey);
-    await prefs.remove(_logsKey);
   }
 }
