@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/models/purchase_log.dart';
+import '../core/services/streak_service.dart';
 import '../core/storage/app_storage.dart';
 import '../features/home/home_shell.dart';
 import '../features/onboarding/onboarding_screen.dart';
@@ -44,25 +45,17 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   }
 
   int get _currentStreakDays {
-    if (_startedAt == null) {
-      return 0;
-    }
-
-    final reference = _logs.isEmpty ? _startedAt! : _logs.first.createdAt;
-    final now = DateTime.now();
-
-    final referenceDay = DateTime(
-      reference.year,
-      reference.month,
-      reference.day,
+    return StreakService.currentStreakDays(
+      startedAt: _startedAt,
+      logs: _logs,
     );
-    final today = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    );
+  }
 
-    return today.difference(referenceDay).inDays;
+  int get _bestStreakDays {
+    return StreakService.bestStreakDays(
+      startedAt: _startedAt,
+      logs: _logs,
+    );
   }
 
   Future<void> _loadSavedState() async {
@@ -144,6 +137,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
           : _isOnboarded
               ? HomeShell(
                   currentStreakDays: _currentStreakDays,
+                  bestStreakDays: _bestStreakDays,
                   urgesDefeated: _urgesDefeated,
                   frequencyPerWeek: _frequencyPerWeek,
                   averageSpend: _averageSpend,

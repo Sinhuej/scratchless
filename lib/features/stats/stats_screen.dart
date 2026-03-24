@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/services/trigger_insight_service.dart';
 import '../../shared/widgets/app_card.dart';
 
 class StatsScreen extends StatelessWidget {
   final List<PurchaseLog> logs;
+  final int currentStreakDays;
+  final int bestStreakDays;
   final double monthlySpendEstimate;
   final double estimatedCashKept;
 
   const StatsScreen({
     super.key,
     required this.logs,
+    required this.currentStreakDays,
+    required this.bestStreakDays,
     required this.monthlySpendEstimate,
     required this.estimatedCashKept,
   });
@@ -24,7 +29,8 @@ class StatsScreen extends StatelessWidget {
     );
 
     final purchaseCount = logs.length;
-    final triggerWindow = _buildRiskWindow(logs);
+    final triggerWindow = TriggerInsightService.riskWindow(logs);
+    final noteInsight = TriggerInsightService.noteInsight(logs);
 
     return Scaffold(
       appBar: AppBar(
@@ -78,6 +84,38 @@ class StatsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
+                  'Streaks',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Current streak: $currentStreakDays day${currentStreakDays == 1 ? '' : 's'}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Best streak: $bestStreakDays day${bestStreakDays == 1 ? '' : 's'}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppTheme.mutedText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
                   'Behavior insight',
                   style: TextStyle(
                     color: AppTheme.mutedText,
@@ -94,9 +132,9 @@ class StatsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'This becomes more useful as you honestly log purchases and notes.',
-                  style: TextStyle(
+                Text(
+                  noteInsight,
+                  style: const TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
                   ),
@@ -177,41 +215,6 @@ class StatsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  static String _buildRiskWindow(List<PurchaseLog> logs) {
-    if (logs.isEmpty) {
-      return 'No trigger pattern yet';
-    }
-
-    final Map<String, int> buckets = {
-      'Morning is your lightest risk window right now.': 0,
-      'Afternoon looks like a recurring purchase window.': 0,
-      'Evening looks like your strongest purchase window.': 0,
-      'Late night may be a vulnerable purchase window.': 0,
-    };
-
-    for (final log in logs) {
-      final hour = log.createdAt.hour;
-      if (hour >= 5 && hour < 12) {
-        buckets['Morning is your lightest risk window right now.'] =
-            buckets['Morning is your lightest risk window right now.']! + 1;
-      } else if (hour >= 12 && hour < 17) {
-        buckets['Afternoon looks like a recurring purchase window.'] =
-            buckets['Afternoon looks like a recurring purchase window.']! + 1;
-      } else if (hour >= 17 && hour < 22) {
-        buckets['Evening looks like your strongest purchase window.'] =
-            buckets['Evening looks like your strongest purchase window.']! + 1;
-      } else {
-        buckets['Late night may be a vulnerable purchase window.'] =
-            buckets['Late night may be a vulnerable purchase window.']! + 1;
-      }
-    }
-
-    final sorted = buckets.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return sorted.first.key;
   }
 
   static String _formatDateTime(DateTime dateTime) {

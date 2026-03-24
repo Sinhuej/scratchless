@@ -11,6 +11,7 @@ import 'widgets/stat_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   final int currentStreakDays;
+  final int bestStreakDays;
   final int urgesDefeated;
   final double averageSpend;
   final double estimatedCashKept;
@@ -23,6 +24,7 @@ class DashboardScreen extends StatelessWidget {
   const DashboardScreen({
     super.key,
     required this.currentStreakDays,
+    required this.bestStreakDays,
     required this.urgesDefeated,
     required this.averageSpend,
     required this.estimatedCashKept,
@@ -48,7 +50,7 @@ class DashboardScreen extends StatelessWidget {
             label: 'Ticket-free streak',
             value: '$currentStreakDays day${currentStreakDays == 1 ? '' : 's'}',
             icon: Icons.local_fire_department_rounded,
-            subtitle: 'Based on your last logged purchase.',
+            subtitle: 'Best streak: $bestStreakDays day${bestStreakDays == 1 ? '' : 's'}.',
           ),
           const SizedBox(height: 12),
           StatCard(

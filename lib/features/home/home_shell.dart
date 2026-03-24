@@ -8,6 +8,7 @@ import '../stats/stats_screen.dart';
 
 class HomeShell extends StatefulWidget {
   final int currentStreakDays;
+  final int bestStreakDays;
   final int urgesDefeated;
   final int frequencyPerWeek;
   final double averageSpend;
@@ -22,6 +23,7 @@ class HomeShell extends StatefulWidget {
   const HomeShell({
     super.key,
     required this.currentStreakDays,
+    required this.bestStreakDays,
     required this.urgesDefeated,
     required this.frequencyPerWeek,
     required this.averageSpend,
@@ -46,6 +48,7 @@ class _HomeShellState extends State<HomeShell> {
     final screens = <Widget>[
       DashboardScreen(
         currentStreakDays: widget.currentStreakDays,
+        bestStreakDays: widget.bestStreakDays,
         urgesDefeated: widget.urgesDefeated,
         averageSpend: widget.averageSpend,
         estimatedCashKept: widget.estimatedCashKept,
@@ -57,6 +60,8 @@ class _HomeShellState extends State<HomeShell> {
       ),
       StatsScreen(
         logs: widget.logs,
+        currentStreakDays: widget.currentStreakDays,
+        bestStreakDays: widget.bestStreakDays,
         monthlySpendEstimate: widget.monthlySpendEstimate,
         estimatedCashKept: widget.estimatedCashKept,
       ),
@@ -65,6 +70,8 @@ class _HomeShellState extends State<HomeShell> {
         frequencyPerWeek: widget.frequencyPerWeek,
         averageSpend: widget.averageSpend,
         monthlySpendEstimate: widget.monthlySpendEstimate,
+        currentStreakDays: widget.currentStreakDays,
+        bestStreakDays: widget.bestStreakDays,
       ),
     ];
 
