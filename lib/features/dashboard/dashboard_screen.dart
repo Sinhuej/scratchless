@@ -18,7 +18,8 @@ class DashboardScreen extends StatelessWidget {
   final double totalSpent;
   final double monthlySpendEstimate;
   final List<PurchaseLog> logs;
-  final void Function(double amount, String? note) onLogPurchase;
+  final void Function(double amount, String? note, List<String> tags)
+      onLogPurchase;
   final VoidCallback onCompleteUrgeSession;
 
   const DashboardScreen({
@@ -50,7 +51,8 @@ class DashboardScreen extends StatelessWidget {
             label: 'Ticket-free streak',
             value: '$currentStreakDays day${currentStreakDays == 1 ? '' : 's'}',
             icon: Icons.local_fire_department_rounded,
-            subtitle: 'Best streak: $bestStreakDays day${bestStreakDays == 1 ? '' : 's'}.',
+            subtitle:
+                'Best streak: $bestStreakDays day${bestStreakDays == 1 ? '' : 's'}.',
           ),
           const SizedBox(height: 12),
           StatCard(
@@ -176,6 +178,19 @@ class DashboardScreen extends StatelessWidget {
                           fontSize: 13,
                         ),
                       ),
+                      if (lastLog.tags.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: lastLog.tags.map((tag) {
+                            return Chip(
+                              label: Text(tag),
+                              visualDensity: VisualDensity.compact,
+                            );
+                          }).toList(),
+                        ),
+                      ],
                       if (lastLog.note != null) ...[
                         const SizedBox(height: 8),
                         Text(

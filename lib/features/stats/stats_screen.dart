@@ -191,6 +191,19 @@ class StatsScreen extends StatelessWidget {
                                     fontSize: 13,
                                   ),
                                 ),
+                                if (log.tags.isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: log.tags.map((tag) {
+                                      return Chip(
+                                        label: Text(tag),
+                                        visualDensity: VisualDensity.compact,
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
                                 if (log.note != null)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4),

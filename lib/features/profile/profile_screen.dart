@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/reminder_settings.dart';
 import '../../shared/widgets/app_card.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -10,6 +11,8 @@ class ProfileScreen extends StatelessWidget {
   final double monthlySpendEstimate;
   final int currentStreakDays;
   final int bestStreakDays;
+  final ReminderSettings reminderSettings;
+  final ValueChanged<ReminderSettings> onUpdateReminderSettings;
 
   const ProfileScreen({
     super.key,
@@ -19,6 +22,8 @@ class ProfileScreen extends StatelessWidget {
     required this.monthlySpendEstimate,
     required this.currentStreakDays,
     required this.bestStreakDays,
+    required this.reminderSettings,
+    required this.onUpdateReminderSettings,
   });
 
   @override
@@ -134,12 +139,82 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Reminder scaffolding',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'These settings save now. Actual notification delivery comes in a later step.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Daily check-in reminder'),
+                  subtitle: const Text('Gentle nudge to log how the day went.'),
+                  value: reminderSettings.dailyCheckInEnabled,
+                  onChanged: (value) {
+                    onUpdateReminderSettings(
+                      reminderSettings.copyWith(
+                        dailyCheckInEnabled: value,
+                      ),
+                    );
+                  },
+                ),
+                if (reminderSettings.dailyCheckInEnabled) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Preferred hour',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: const <int>[17, 19, 20, 21].map((hour) {
+                      return _HourChip(hour: hour);
+                    }).toList(),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Evening support reminder'),
+                  subtitle: const Text('Scaffold a future reminder during common risk hours.'),
+                  value: reminderSettings.eveningSupportEnabled,
+                  onChanged: (value) {
+                    onUpdateReminderSettings(
+                      reminderSettings.copyWith(
+                        eveningSupportEnabled: value,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           const AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Step 3 notes',
+                  'Step 4 notes',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 13,
@@ -148,7 +223,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Streaks now use purchase-free days instead of a simpler placeholder calculation.',
+                  'Quick trigger tags make logging easier and improve insight quality without forcing long notes.',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -156,7 +231,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Trigger note insights stay lightweight and become better as the user logs honest notes.',
+                  'Reminder settings are saved now so notification delivery can be added cleanly in a later step.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
@@ -168,5 +243,38 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _HourChip extends StatelessWidget {
+  final int hour;
+
+  const _HourChip({
+    required this.hour,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final profile =
+        context.findAncestorWidgetOfExactType<ProfileScreen>()!;
+    final selected = profile.reminderSettings.dailyCheckInHour == hour;
+
+    return ChoiceChip(
+      label: Text(_label(hour)),
+      selected: selected,
+      onSelected: (_) {
+        profile.onUpdateReminderSettings(
+          profile.reminderSettings.copyWith(
+            dailyCheckInHour: hour,
+          ),
+        );
+      },
+    );
+  }
+
+  static String _label(int hour) {
+    final suffix = hour >= 12 ? 'PM' : 'AM';
+    final value = hour > 12 ? hour - 12 : hour;
+    return '$value:00 $suffix';
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/models/reminder_settings.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../profile/profile_screen.dart';
 import '../stats/stats_screen.dart';
@@ -17,8 +18,11 @@ class HomeShell extends StatefulWidget {
   final double monthlySpendEstimate;
   final String goal;
   final List<PurchaseLog> logs;
-  final void Function(double amount, String? note) onLogPurchase;
+  final ReminderSettings reminderSettings;
+  final void Function(double amount, String? note, List<String> tags)
+      onLogPurchase;
   final VoidCallback onCompleteUrgeSession;
+  final ValueChanged<ReminderSettings> onUpdateReminderSettings;
 
   const HomeShell({
     super.key,
@@ -32,8 +36,10 @@ class HomeShell extends StatefulWidget {
     required this.monthlySpendEstimate,
     required this.goal,
     required this.logs,
+    required this.reminderSettings,
     required this.onLogPurchase,
     required this.onCompleteUrgeSession,
+    required this.onUpdateReminderSettings,
   });
 
   @override
@@ -72,6 +78,8 @@ class _HomeShellState extends State<HomeShell> {
         monthlySpendEstimate: widget.monthlySpendEstimate,
         currentStreakDays: widget.currentStreakDays,
         bestStreakDays: widget.bestStreakDays,
+        reminderSettings: widget.reminderSettings,
+        onUpdateReminderSettings: widget.onUpdateReminderSettings,
       ),
     ];
 

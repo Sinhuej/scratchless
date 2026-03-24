@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/purchase_log.dart';
+import '../models/reminder_settings.dart';
 
 class StoredAppState {
   final bool isOnboarded;
@@ -12,6 +13,7 @@ class StoredAppState {
   final String goal;
   final int urgesDefeated;
   final List<PurchaseLog> logs;
+  final ReminderSettings reminderSettings;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -21,17 +23,19 @@ class StoredAppState {
     required this.goal,
     required this.urgesDefeated,
     required this.logs,
+    required this.reminderSettings,
   });
 
   factory StoredAppState.empty() {
-    return const StoredAppState(
+    return StoredAppState(
       isOnboarded: false,
       startedAt: null,
       frequencyPerWeek: 3,
       averageSpend: 10,
       goal: 'Spend less',
       urgesDefeated: 0,
-      logs: <PurchaseLog>[],
+      logs: const <PurchaseLog>[],
+      reminderSettings: ReminderSettings.defaults(),
     );
   }
 }
@@ -44,6 +48,10 @@ class AppStorage {
   static const String _goalKey = 'goal';
   static const String _urgesDefeatedKey = 'urges_defeated';
   static const String _logsKey = 'purchase_logs';
+
+  static const String _dailyCheckInEnabledKey = 'daily_check_in_enabled';
+  static const String _eveningSupportEnabledKey = 'evening_support_enabled';
+  static const String _dailyCheckInHourKey = 'daily_check_in_hour';
 
   static Future<StoredAppState> load() async {
     try {
@@ -68,6 +76,14 @@ class AppStorage {
         goal: prefs.getString(_goalKey) ?? 'Spend less',
         urgesDefeated: prefs.getInt(_urgesDefeatedKey) ?? 0,
         logs: logs,
+        reminderSettings: ReminderSettings(
+          dailyCheckInEnabled:
+              prefs.getBool(_dailyCheckInEnabledKey) ?? false,
+          eveningSupportEnabled:
+              prefs.getBool(_eveningSupportEnabledKey) ?? false,
+          dailyCheckInHour:
+              prefs.getInt(_dailyCheckInHourKey) ?? 20,
+        ),
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -80,7 +96,10 @@ class AppStorage {
     await prefs.setBool(_isOnboardedKey, state.isOnboarded);
 
     if (state.startedAt != null) {
-      await prefs.setString(_startedAtKey, state.startedAt!.toIso8601String());
+      await prefs.setString(
+        _startedAtKey,
+        state.startedAt!.toIso8601String(),
+      );
     } else {
       await prefs.remove(_startedAtKey);
     }
@@ -92,7 +111,19 @@ class AppStorage {
 
     final encodedLogs =
         state.logs.map((log) => jsonEncode(log.toJson())).toList();
-
     await prefs.setStringList(_logsKey, encodedLogs);
+
+    await prefs.setBool(
+      _dailyCheckInEnabledKey,
+      state.reminderSettings.dailyCheckInEnabled,
+    );
+    await prefs.setBool(
+      _eveningSupportEnabledKey,
+      state.reminderSettings.eveningSupportEnabled,
+    );
+    await prefs.setInt(
+      _dailyCheckInHourKey,
+      state.reminderSettings.dailyCheckInHour,
+    );
   }
 }

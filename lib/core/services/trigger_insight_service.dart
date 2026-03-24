@@ -37,6 +37,20 @@ class TriggerInsightService {
   }
 
   static String noteInsight(List<PurchaseLog> logs) {
+    final tagCounts = <String, int>{};
+
+    for (final log in logs) {
+      for (final tag in log.tags) {
+        tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+      }
+    }
+
+    if (tagCounts.isNotEmpty) {
+      final sorted = tagCounts.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      return 'Most common trigger tag so far: ${sorted.first.key}';
+    }
+
     final notes = logs
         .map((log) => log.note?.trim().toLowerCase())
         .whereType<String>()
@@ -44,7 +58,7 @@ class TriggerInsightService {
         .toList();
 
     if (notes.isEmpty) {
-      return 'Add a short note when you log a purchase to uncover patterns like stress, boredom, or after-work habits.';
+      return 'Add a quick tag or short note when you log a purchase to uncover patterns like stress, boredom, or after-work habits.';
     }
 
     final keywordMap = <String, List<String>>{

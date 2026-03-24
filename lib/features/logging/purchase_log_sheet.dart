@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../shared/widgets/app_button.dart';
 
 class PurchaseLogSheet extends StatefulWidget {
-  final void Function(double amount, String? note) onSave;
+  final void Function(double amount, String? note, List<String> tags) onSave;
 
   const PurchaseLogSheet({
     super.key,
@@ -17,8 +17,19 @@ class PurchaseLogSheet extends StatefulWidget {
 class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
   double _selectedAmount = 10;
   final TextEditingController _noteController = TextEditingController();
+  final Set<String> _selectedTags = <String>{};
 
   static const List<double> _amounts = <double>[5, 10, 20, 30, 50];
+
+  static const List<String> _quickTags = <String>[
+    'Stress',
+    'Boredom',
+    'After work',
+    'Money pressure',
+    'Lonely',
+    'Store stop',
+    'Nighttime',
+  ];
 
   @override
   void dispose() {
@@ -63,6 +74,38 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 18),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Quick trigger tags',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: _quickTags.map((tag) {
+                final isSelected = _selectedTags.contains(tag);
+                return FilterChip(
+                  label: Text(tag),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedTags.remove(tag);
+                      } else {
+                        _selectedTags.add(tag);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: _noteController,
@@ -81,7 +124,11 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
                     ? null
                     : _noteController.text.trim();
 
-                widget.onSave(_selectedAmount, note);
+                widget.onSave(
+                  _selectedAmount,
+                  note,
+                  _selectedTags.toList(),
+                );
                 Navigator.of(context).pop();
               },
             ),

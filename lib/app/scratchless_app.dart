@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/models/purchase_log.dart';
+import '../core/models/reminder_settings.dart';
 import '../core/services/streak_service.dart';
 import '../core/storage/app_storage.dart';
 import '../features/home/home_shell.dart';
@@ -25,6 +26,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
 
   int _urgesDefeated = 0;
   List<PurchaseLog> _logs = <PurchaseLog>[];
+  ReminderSettings _reminderSettings = ReminderSettings.defaults();
 
   @override
   void initState() {
@@ -74,6 +76,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _goal = stored.goal;
       _urgesDefeated = stored.urgesDefeated;
       _logs = stored.logs;
+      _reminderSettings = stored.reminderSettings;
     });
   }
 
@@ -87,6 +90,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         goal: _goal,
         urgesDefeated: _urgesDefeated,
         logs: _logs,
+        reminderSettings: _reminderSettings,
       ),
     );
   }
@@ -103,13 +107,14 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
-  void _logPurchase(double amount, String? note) {
+  void _logPurchase(double amount, String? note, List<String> tags) {
     setState(() {
       _logs = <PurchaseLog>[
         PurchaseLog(
           createdAt: DateTime.now(),
           amount: amount,
           note: note,
+          tags: tags,
         ),
         ..._logs,
       ];
@@ -121,6 +126,14 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   void _completeUrgeSession() {
     setState(() {
       _urgesDefeated += 1;
+    });
+
+    _persistState();
+  }
+
+  void _updateReminderSettings(ReminderSettings settings) {
+    setState(() {
+      _reminderSettings = settings;
     });
 
     _persistState();
@@ -146,8 +159,10 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   monthlySpendEstimate: _monthlySpendEstimate,
                   goal: _goal,
                   logs: _logs,
+                  reminderSettings: _reminderSettings,
                   onLogPurchase: _logPurchase,
                   onCompleteUrgeSession: _completeUrgeSession,
+                  onUpdateReminderSettings: _updateReminderSettings,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,
