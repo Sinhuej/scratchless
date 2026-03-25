@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/services/feature_gate_service.dart';
 import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
+import '../../features/premium/premium_screen.dart';
+import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 import '../logging/purchase_log_sheet.dart';
 import 'widgets/simple_spend_chart.dart';
@@ -15,6 +19,8 @@ class StatsScreen extends StatelessWidget {
   final double monthlySpendEstimate;
   final double estimatedCashKept;
   final WeeklySummary weeklySummary;
+  final PremiumState premiumState;
+  final VoidCallback onStartPremiumTrial;
   final void Function(String id, double amount, String? note, List<String> tags)
       onEditPurchase;
   final void Function(String id) onDeletePurchase;
@@ -27,6 +33,8 @@ class StatsScreen extends StatelessWidget {
     required this.monthlySpendEstimate,
     required this.estimatedCashKept,
     required this.weeklySummary,
+    required this.premiumState,
+    required this.onStartPremiumTrial,
     required this.onEditPurchase,
     required this.onDeletePurchase,
   });
@@ -49,6 +57,17 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
+  void _openPremiumScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PremiumScreen(
+          premiumState: premiumState,
+          onStartTrial: onStartPremiumTrial,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final totalSpent = logs.fold<double>(
@@ -59,6 +78,9 @@ class StatsScreen extends StatelessWidget {
     final purchaseCount = logs.length;
     final triggerWindow = TriggerInsightService.riskWindow(logs);
     final noteInsight = TriggerInsightService.noteInsight(logs);
+
+    final advancedUnlocked =
+        FeatureGateService.advancedInsightsUnlocked(premiumState);
 
     return Scaffold(
       appBar: AppBar(
@@ -141,6 +163,51 @@ class StatsScreen extends StatelessWidget {
                     points: weeklySummary.spendPoints,
                   ),
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: advancedUnlocked ? null : () => _openPremiumScreen(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  advancedUnlocked ? 'Premium insights' : 'Premium insights',
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (advancedUnlocked) ...[
+                  const Text(
+                    'Premium scaffold is active.',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Upcoming premium depth will build here: longer history, deeper trigger patterns, and reflection reports.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                ] else ...[
+                  const _LockedLine('30-day trend view'),
+                  const _LockedLine('Weekly reflection report'),
+                  const _LockedLine('Exportable progress summary'),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Unlock Premium',
+                    icon: Icons.lock_open_rounded,
+                    onPressed: () => _openPremiumScreen(context),
+                  ),
+                ],
               ],
             ),
           ),
@@ -390,5 +457,37 @@ class StatsScreen extends StatelessWidget {
     final minute = dateTime.minute.toString().padLeft(2, '0');
     final suffix = dateTime.hour >= 12 ? 'PM' : 'AM';
     return '${dateTime.month}/${dateTime.day}/${dateTime.year}  $hour:$minute $suffix';
+  }
+}
+
+class _LockedLine extends StatelessWidget {
+  final String text;
+
+  const _LockedLine(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.lock_rounded,
+            size: 16,
+            color: AppTheme.mutedText,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

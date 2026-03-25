@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
 import '../models/urge_session_log.dart';
@@ -16,6 +17,7 @@ class StoredAppState {
   final List<PurchaseLog> logs;
   final ReminderSettings reminderSettings;
   final List<UrgeSessionLog> urgeSessions;
+  final PremiumState premiumState;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -27,6 +29,7 @@ class StoredAppState {
     required this.logs,
     required this.reminderSettings,
     required this.urgeSessions,
+    required this.premiumState,
   });
 
   factory StoredAppState.empty() {
@@ -40,6 +43,7 @@ class StoredAppState {
       logs: const <PurchaseLog>[],
       reminderSettings: ReminderSettings.defaults(),
       urgeSessions: const <UrgeSessionLog>[],
+      premiumState: PremiumState.free(),
     );
   }
 }
@@ -57,6 +61,9 @@ class AppStorage {
   static const String _dailyCheckInEnabledKey = 'daily_check_in_enabled';
   static const String _eveningSupportEnabledKey = 'evening_support_enabled';
   static const String _dailyCheckInHourKey = 'daily_check_in_hour';
+
+  static const String _isPremiumKey = 'is_premium';
+  static const String _trialStartedAtKey = 'trial_started_at';
 
   static Future<StoredAppState> load() async {
     try {
@@ -81,6 +88,11 @@ class AppStorage {
       }).toList()
         ..sort((a, b) => b.completedAt.compareTo(a.completedAt));
 
+      final trialStartedAtRaw = prefs.getString(_trialStartedAtKey);
+      final trialStartedAt = trialStartedAtRaw == null
+          ? null
+          : DateTime.tryParse(trialStartedAtRaw);
+
       return StoredAppState(
         isOnboarded: prefs.getBool(_isOnboardedKey) ?? false,
         startedAt: startedAt,
@@ -98,6 +110,10 @@ class AppStorage {
               prefs.getInt(_dailyCheckInHourKey) ?? 20,
         ),
         urgeSessions: urgeSessions,
+        premiumState: PremiumState(
+          isPremium: prefs.getBool(_isPremiumKey) ?? false,
+          trialStartedAt: trialStartedAt,
+        ),
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -144,5 +160,16 @@ class AppStorage {
       _dailyCheckInHourKey,
       state.reminderSettings.dailyCheckInHour,
     );
+
+    await prefs.setBool(_isPremiumKey, state.premiumState.isPremium);
+
+    if (state.premiumState.trialStartedAt != null) {
+      await prefs.setString(
+        _trialStartedAtKey,
+        state.premiumState.trialStartedAt!.toIso8601String(),
+      );
+    } else {
+      await prefs.remove(_trialStartedAtKey);
+    }
   }
 }

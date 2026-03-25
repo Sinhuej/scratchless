@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/models/premium_state.dart';
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
 import '../core/models/urge_session_log.dart';
@@ -31,6 +32,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   List<PurchaseLog> _logs = <PurchaseLog>[];
   List<UrgeSessionLog> _urgeSessions = <UrgeSessionLog>[];
   ReminderSettings _reminderSettings = ReminderSettings.defaults();
+  PremiumState _premiumState = PremiumState.free();
 
   @override
   void initState() {
@@ -91,6 +93,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _logs = stored.logs;
       _reminderSettings = stored.reminderSettings;
       _urgeSessions = stored.urgeSessions;
+      _premiumState = stored.premiumState;
     });
   }
 
@@ -106,6 +109,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         logs: _logs,
         reminderSettings: _reminderSettings,
         urgeSessions: _urgeSessions,
+        premiumState: _premiumState,
       ),
     );
   }
@@ -195,6 +199,21 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     LocalNotificationService.instance.syncReminderSettings(settings);
   }
 
+  void _startPremiumTrial() {
+    if (_premiumState.isPremium) {
+      return;
+    }
+
+    setState(() {
+      _premiumState = PremiumState(
+        isPremium: true,
+        trialStartedAt: DateTime.now(),
+      );
+    });
+
+    _persistState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -217,11 +236,13 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   logs: _logs,
                   reminderSettings: _reminderSettings,
                   weeklySummary: _weeklySummary,
+                  premiumState: _premiumState,
                   onLogPurchase: _logPurchase,
                   onEditPurchase: _editPurchase,
                   onDeletePurchase: _deletePurchase,
                   onCompleteUrgeSession: _completeUrgeSession,
                   onUpdateReminderSettings: _updateReminderSettings,
+                  onStartPremiumTrial: _startPremiumTrial,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,

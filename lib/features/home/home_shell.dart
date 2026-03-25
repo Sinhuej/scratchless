@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/reminder_settings.dart';
 import '../../core/services/weekly_summary_service.dart';
@@ -21,6 +22,7 @@ class HomeShell extends StatefulWidget {
   final List<PurchaseLog> logs;
   final ReminderSettings reminderSettings;
   final WeeklySummary weeklySummary;
+  final PremiumState premiumState;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -28,6 +30,7 @@ class HomeShell extends StatefulWidget {
   final void Function(String id) onDeletePurchase;
   final VoidCallback onCompleteUrgeSession;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
+  final VoidCallback onStartPremiumTrial;
 
   const HomeShell({
     super.key,
@@ -43,11 +46,13 @@ class HomeShell extends StatefulWidget {
     required this.logs,
     required this.reminderSettings,
     required this.weeklySummary,
+    required this.premiumState,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
     required this.onCompleteUrgeSession,
     required this.onUpdateReminderSettings,
+    required this.onStartPremiumTrial,
   });
 
   @override
@@ -82,6 +87,8 @@ class _HomeShellState extends State<HomeShell> {
         monthlySpendEstimate: widget.monthlySpendEstimate,
         estimatedCashKept: widget.estimatedCashKept,
         weeklySummary: widget.weeklySummary,
+        premiumState: widget.premiumState,
+        onStartPremiumTrial: widget.onStartPremiumTrial,
         onEditPurchase: widget.onEditPurchase,
         onDeletePurchase: widget.onDeletePurchase,
       ),
@@ -93,7 +100,9 @@ class _HomeShellState extends State<HomeShell> {
         currentStreakDays: widget.currentStreakDays,
         bestStreakDays: widget.bestStreakDays,
         reminderSettings: widget.reminderSettings,
+        premiumState: widget.premiumState,
         onUpdateReminderSettings: widget.onUpdateReminderSettings,
+        onStartPremiumTrial: widget.onStartPremiumTrial,
       ),
     ];
 

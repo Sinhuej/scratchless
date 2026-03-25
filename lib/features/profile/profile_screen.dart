@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/premium_state.dart';
 import '../../core/models/reminder_settings.dart';
+import '../../core/services/feature_gate_service.dart';
+import '../../features/premium/premium_screen.dart';
 import '../../shared/widgets/app_card.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -12,7 +15,9 @@ class ProfileScreen extends StatelessWidget {
   final int currentStreakDays;
   final int bestStreakDays;
   final ReminderSettings reminderSettings;
+  final PremiumState premiumState;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
+  final VoidCallback onStartPremiumTrial;
 
   const ProfileScreen({
     super.key,
@@ -23,11 +28,27 @@ class ProfileScreen extends StatelessWidget {
     required this.currentStreakDays,
     required this.bestStreakDays,
     required this.reminderSettings,
+    required this.premiumState,
     required this.onUpdateReminderSettings,
+    required this.onStartPremiumTrial,
   });
+
+  void _openPremiumScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PremiumScreen(
+          premiumState: premiumState,
+          onStartTrial: onStartPremiumTrial,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final customReminderUnlocked =
+        FeatureGateService.customReminderSchedulesUnlocked(premiumState);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -35,6 +56,49 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          AppCard(
+            onTap: () => _openPremiumScreen(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'ScratchLess Premium',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  FeatureGateService.premiumStatusLabel(premiumState),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  premiumState.isPremium
+                      ? 'You have access to premium scaffolding and upcoming deeper insight tools.'
+                      : 'Unlock deeper insights, longer history, custom reminder schedules, and more support tools.',
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Tap to view Premium',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +217,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'These now schedule real local reminders after permission is granted.',
+                  'These schedule real local reminders after permission is granted.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
@@ -191,6 +255,24 @@ class ProfileScreen extends StatelessWidget {
                     }).toList(),
                   ),
                 ],
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    customReminderUnlocked
+                        ? Icons.lock_open_rounded
+                        : Icons.lock_rounded,
+                  ),
+                  title: const Text('Custom reminder schedules'),
+                  subtitle: Text(
+                    customReminderUnlocked
+                        ? 'Premium scaffold unlocked. Expanded reminder scheduling comes next.'
+                        : 'Premium feature',
+                  ),
+                  onTap: customReminderUnlocked
+                      ? null
+                      : () => _openPremiumScreen(context),
+                ),
                 const SizedBox(height: 8),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
@@ -214,7 +296,7 @@ class ProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Step 5 notes',
+                  'Step 8 notes',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 13,
@@ -223,7 +305,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Reminders now deliver locally on-device once permission is granted.',
+                  'Premium is scaffolded softly here: the core path stays free while deeper tools are positioned as an optional upgrade.',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -231,7 +313,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Daily check-in uses the selected hour. Evening support is fixed at 7:00 PM for now.',
+                  'Billing and store purchases come later. This step is about fair structure and feature gating.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
