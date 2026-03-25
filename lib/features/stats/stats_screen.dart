@@ -6,6 +6,7 @@ import '../../core/models/purchase_log.dart';
 import '../../core/services/feature_gate_service.dart';
 import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
+import '../../features/premium/premium_history_screen.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
@@ -63,6 +64,16 @@ class StatsScreen extends StatelessWidget {
         builder: (_) => PremiumScreen(
           premiumState: premiumState,
           onStartTrial: onStartPremiumTrial,
+        ),
+      ),
+    );
+  }
+
+  void _openPremiumHistoryScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PremiumHistoryScreen(
+          logs: logs,
         ),
       ),
     );
@@ -168,13 +179,19 @@ class StatsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           AppCard(
-            onTap: advancedUnlocked ? null : () => _openPremiumScreen(context),
+            onTap: () {
+              if (advancedUnlocked) {
+                _openPremiumHistoryScreen(context);
+              } else {
+                _openPremiumScreen(context);
+              }
+            },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  advancedUnlocked ? 'Premium insights' : 'Premium insights',
-                  style: const TextStyle(
+                const Text(
+                  'Premium insights',
+                  style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -183,7 +200,7 @@ class StatsScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 if (advancedUnlocked) ...[
                   const Text(
-                    'Premium scaffold is active.',
+                    '30-day trigger breakdown is active.',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -191,16 +208,22 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Upcoming premium depth will build here: longer history, deeper trigger patterns, and reflection reports.',
+                    'Open your 30-day insights to see the trigger breakdown and longer history view.',
                     style: TextStyle(
                       color: AppTheme.mutedText,
                       fontSize: 14,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Open 30-day insights',
+                    icon: Icons.insights_rounded,
+                    onPressed: () => _openPremiumHistoryScreen(context),
+                  ),
                 ] else ...[
-                  const _LockedLine('30-day trend view'),
+                  const _LockedLine('30-day trigger breakdown'),
+                  const _LockedLine('Longer history view'),
                   const _LockedLine('Weekly reflection report'),
-                  const _LockedLine('Exportable progress summary'),
                   const SizedBox(height: 12),
                   AppButton(
                     label: 'Unlock Premium',
