@@ -23,6 +23,9 @@ class HomeShell extends StatefulWidget {
   final WeeklySummary weeklySummary;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
+  final void Function(String id, double amount, String? note, List<String> tags)
+      onEditPurchase;
+  final void Function(String id) onDeletePurchase;
   final VoidCallback onCompleteUrgeSession;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
 
@@ -41,6 +44,8 @@ class HomeShell extends StatefulWidget {
     required this.reminderSettings,
     required this.weeklySummary,
     required this.onLogPurchase,
+    required this.onEditPurchase,
+    required this.onDeletePurchase,
     required this.onCompleteUrgeSession,
     required this.onUpdateReminderSettings,
   });
@@ -66,6 +71,8 @@ class _HomeShellState extends State<HomeShell> {
         logs: widget.logs,
         weeklySummary: widget.weeklySummary,
         onLogPurchase: widget.onLogPurchase,
+        onEditPurchase: widget.onEditPurchase,
+        onDeletePurchase: widget.onDeletePurchase,
         onCompleteUrgeSession: widget.onCompleteUrgeSession,
       ),
       StatsScreen(
@@ -75,6 +82,8 @@ class _HomeShellState extends State<HomeShell> {
         monthlySpendEstimate: widget.monthlySpendEstimate,
         estimatedCashKept: widget.estimatedCashKept,
         weeklySummary: widget.weeklySummary,
+        onEditPurchase: widget.onEditPurchase,
+        onDeletePurchase: widget.onDeletePurchase,
       ),
       ProfileScreen(
         goal: widget.goal,

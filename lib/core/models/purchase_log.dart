@@ -1,10 +1,12 @@
 class PurchaseLog {
+  final String id;
   final DateTime createdAt;
   final double amount;
   final String? note;
   final List<String> tags;
 
   const PurchaseLog({
+    required this.id,
     required this.createdAt,
     required this.amount,
     this.note,
@@ -13,6 +15,7 @@ class PurchaseLog {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'createdAt': createdAt.toIso8601String(),
       'amount': amount,
       'note': note,
@@ -31,11 +34,32 @@ class PurchaseLog {
         ? rawTags.map((item) => item.toString()).toList()
         : <String>[];
 
+    final fallbackId = parsedDate == null
+        ? DateTime.now().microsecondsSinceEpoch.toString()
+        : parsedDate.microsecondsSinceEpoch.toString();
+
     return PurchaseLog(
+      id: json['id']?.toString() ?? fallbackId,
       createdAt: parsedDate ?? DateTime.now(),
       amount: (json['amount'] as num?)?.toDouble() ?? 0,
       note: json['note']?.toString(),
       tags: tags,
+    );
+  }
+
+  PurchaseLog copyWith({
+    String? id,
+    DateTime? createdAt,
+    double? amount,
+    String? note,
+    List<String>? tags,
+  }) {
+    return PurchaseLog(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      amount: amount ?? this.amount,
+      note: note ?? this.note,
+      tags: tags ?? this.tags,
     );
   }
 }

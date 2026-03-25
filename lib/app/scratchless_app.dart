@@ -126,6 +126,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     setState(() {
       _logs = <PurchaseLog>[
         PurchaseLog(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
           createdAt: DateTime.now(),
           amount: amount,
           note: note,
@@ -133,6 +134,39 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         ),
         ..._logs,
       ];
+    });
+
+    _persistState();
+  }
+
+  void _editPurchase(
+    String id,
+    double amount,
+    String? note,
+    List<String> tags,
+  ) {
+    setState(() {
+      _logs = _logs.map((log) {
+        if (log.id != id) {
+          return log;
+        }
+
+        return log.copyWith(
+          amount: amount,
+          note: note,
+          tags: tags,
+        );
+      }).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    });
+
+    _persistState();
+  }
+
+  void _deletePurchase(String id) {
+    setState(() {
+      _logs = _logs.where((log) => log.id != id).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     });
 
     _persistState();
@@ -184,6 +218,8 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   reminderSettings: _reminderSettings,
                   weeklySummary: _weeklySummary,
                   onLogPurchase: _logPurchase,
+                  onEditPurchase: _editPurchase,
+                  onDeletePurchase: _deletePurchase,
                   onCompleteUrgeSession: _completeUrgeSession,
                   onUpdateReminderSettings: _updateReminderSettings,
                 )

@@ -22,6 +22,9 @@ class DashboardScreen extends StatelessWidget {
   final WeeklySummary weeklySummary;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
+  final void Function(String id, double amount, String? note, List<String> tags)
+      onEditPurchase;
+  final void Function(String id) onDeletePurchase;
   final VoidCallback onCompleteUrgeSession;
 
   const DashboardScreen({
@@ -36,8 +39,28 @@ class DashboardScreen extends StatelessWidget {
     required this.logs,
     required this.weeklySummary,
     required this.onLogPurchase,
+    required this.onEditPurchase,
+    required this.onDeletePurchase,
     required this.onCompleteUrgeSession,
   });
+
+  void _showEditSheet(BuildContext context, PurchaseLog log) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return PurchaseLogSheet(
+          initialLog: log,
+          onSave: (amount, note, tags) {
+            onEditPurchase(log.id, amount, note, tags);
+          },
+          onDelete: () {
+            onDeletePurchase(log.id);
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +212,11 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           AppCard(
+            onTap: lastLog == null
+                ? null
+                : () {
+                    _showEditSheet(context, lastLog);
+                  },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -226,6 +254,14 @@ class DashboardScreen extends StatelessWidget {
                         style: const TextStyle(
                           color: AppTheme.mutedText,
                           fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Tap to edit or delete.',
+                        style: TextStyle(
+                          color: AppTheme.mutedText,
+                          fontSize: 12,
                         ),
                       ),
                       if (lastLog.tags.isNotEmpty) ...[
