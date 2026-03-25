@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/services/trigger_insight_service.dart';
+import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_card.dart';
+import 'widgets/simple_spend_chart.dart';
 
 class StatsScreen extends StatelessWidget {
   final List<PurchaseLog> logs;
@@ -11,6 +13,7 @@ class StatsScreen extends StatelessWidget {
   final int bestStreakDays;
   final double monthlySpendEstimate;
   final double estimatedCashKept;
+  final WeeklySummary weeklySummary;
 
   const StatsScreen({
     super.key,
@@ -19,6 +22,7 @@ class StatsScreen extends StatelessWidget {
     required this.bestStreakDays,
     required this.monthlySpendEstimate,
     required this.estimatedCashKept,
+    required this.weeklySummary,
   });
 
   @override
@@ -39,6 +43,84 @@ class StatsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Weekly snapshot',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 24,
+                  runSpacing: 16,
+                  children: [
+                    _metric(
+                      label: 'Spent',
+                      value: '\$${weeklySummary.spentThisWeek.toStringAsFixed(0)}',
+                    ),
+                    _metric(
+                      label: 'Kept',
+                      value: '\$${weeklySummary.cashKeptThisWeek.toStringAsFixed(0)}',
+                    ),
+                    _metric(
+                      label: 'Purchases',
+                      value: '${weeklySummary.purchasesThisWeek}',
+                    ),
+                    _metric(
+                      label: 'Urge wins',
+                      value: '${weeklySummary.urgeWinsThisWeek}',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  weeklySummary.comparisonMessage,
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Top trigger this week: ${weeklySummary.topTriggerThisWeek}',
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '7-day spend chart',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 150,
+                  child: SimpleSpendChart(
+                    points: weeklySummary.spendPoints,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,6 +309,33 @@ class StatsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  static Widget _metric({
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppTheme.mutedText,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 import '../logging/purchase_log_sheet.dart';
@@ -18,6 +19,7 @@ class DashboardScreen extends StatelessWidget {
   final double totalSpent;
   final double monthlySpendEstimate;
   final List<PurchaseLog> logs;
+  final WeeklySummary weeklySummary;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final VoidCallback onCompleteUrgeSession;
@@ -32,6 +34,7 @@ class DashboardScreen extends StatelessWidget {
     required this.totalSpent,
     required this.monthlySpendEstimate,
     required this.logs,
+    required this.weeklySummary,
     required this.onLogPurchase,
     required this.onCompleteUrgeSession,
   });
@@ -106,6 +109,53 @@ class DashboardScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Weekly snapshot',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 24,
+                  runSpacing: 16,
+                  children: [
+                    _metric(
+                      label: 'Spent',
+                      value: '\$${weeklySummary.spentThisWeek.toStringAsFixed(0)}',
+                    ),
+                    _metric(
+                      label: 'Kept',
+                      value: '\$${weeklySummary.cashKeptThisWeek.toStringAsFixed(0)}',
+                    ),
+                    _metric(
+                      label: 'Purchases',
+                      value: '${weeklySummary.purchasesThisWeek}',
+                    ),
+                    _metric(
+                      label: 'Urge wins',
+                      value: '${weeklySummary.urgeWinsThisWeek}',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  weeklySummary.comparisonMessage,
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,6 +258,33 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  static Widget _metric({
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppTheme.mutedText,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
     );
   }
 

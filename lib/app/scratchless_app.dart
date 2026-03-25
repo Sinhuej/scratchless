@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
+import '../core/models/urge_session_log.dart';
 import '../core/services/local_notification_service.dart';
 import '../core/services/streak_service.dart';
+import '../core/services/weekly_summary_service.dart';
 import '../core/storage/app_storage.dart';
 import '../features/home/home_shell.dart';
 import '../features/onboarding/onboarding_screen.dart';
@@ -27,6 +29,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
 
   int _urgesDefeated = 0;
   List<PurchaseLog> _logs = <PurchaseLog>[];
+  List<UrgeSessionLog> _urgeSessions = <UrgeSessionLog>[];
   ReminderSettings _reminderSettings = ReminderSettings.defaults();
 
   @override
@@ -61,6 +64,14 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     );
   }
 
+  WeeklySummary get _weeklySummary {
+    return WeeklySummaryService.build(
+      purchaseLogs: _logs,
+      urgeSessions: _urgeSessions,
+      averageSpend: _averageSpend,
+    );
+  }
+
   Future<void> _bootstrap() async {
     await LocalNotificationService.instance.initialize();
     final stored = await AppStorage.load();
@@ -79,6 +90,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _urgesDefeated = stored.urgesDefeated;
       _logs = stored.logs;
       _reminderSettings = stored.reminderSettings;
+      _urgeSessions = stored.urgeSessions;
     });
   }
 
@@ -93,6 +105,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         urgesDefeated: _urgesDefeated,
         logs: _logs,
         reminderSettings: _reminderSettings,
+        urgeSessions: _urgeSessions,
       ),
     );
   }
@@ -128,6 +141,12 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   void _completeUrgeSession() {
     setState(() {
       _urgesDefeated += 1;
+      _urgeSessions = <UrgeSessionLog>[
+        UrgeSessionLog(
+          completedAt: DateTime.now(),
+        ),
+        ..._urgeSessions,
+      ];
     });
 
     _persistState();
@@ -163,6 +182,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   goal: _goal,
                   logs: _logs,
                   reminderSettings: _reminderSettings,
+                  weeklySummary: _weeklySummary,
                   onLogPurchase: _logPurchase,
                   onCompleteUrgeSession: _completeUrgeSession,
                   onUpdateReminderSettings: _updateReminderSettings,

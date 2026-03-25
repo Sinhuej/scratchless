@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
+import '../models/urge_session_log.dart';
 
 class StoredAppState {
   final bool isOnboarded;
@@ -14,6 +15,7 @@ class StoredAppState {
   final int urgesDefeated;
   final List<PurchaseLog> logs;
   final ReminderSettings reminderSettings;
+  final List<UrgeSessionLog> urgeSessions;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -24,6 +26,7 @@ class StoredAppState {
     required this.urgesDefeated,
     required this.logs,
     required this.reminderSettings,
+    required this.urgeSessions,
   });
 
   factory StoredAppState.empty() {
@@ -36,6 +39,7 @@ class StoredAppState {
       urgesDefeated: 0,
       logs: const <PurchaseLog>[],
       reminderSettings: ReminderSettings.defaults(),
+      urgeSessions: const <UrgeSessionLog>[],
     );
   }
 }
@@ -48,6 +52,7 @@ class AppStorage {
   static const String _goalKey = 'goal';
   static const String _urgesDefeatedKey = 'urges_defeated';
   static const String _logsKey = 'purchase_logs';
+  static const String _urgeSessionsKey = 'urge_sessions';
 
   static const String _dailyCheckInEnabledKey = 'daily_check_in_enabled';
   static const String _eveningSupportEnabledKey = 'evening_support_enabled';
@@ -68,6 +73,14 @@ class AppStorage {
       }).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
+      final rawUrgeSessions =
+          prefs.getStringList(_urgeSessionsKey) ?? <String>[];
+      final urgeSessions = rawUrgeSessions.map((raw) {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        return UrgeSessionLog.fromJson(decoded);
+      }).toList()
+        ..sort((a, b) => b.completedAt.compareTo(a.completedAt));
+
       return StoredAppState(
         isOnboarded: prefs.getBool(_isOnboardedKey) ?? false,
         startedAt: startedAt,
@@ -84,6 +97,7 @@ class AppStorage {
           dailyCheckInHour:
               prefs.getInt(_dailyCheckInHourKey) ?? 20,
         ),
+        urgeSessions: urgeSessions,
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -112,6 +126,11 @@ class AppStorage {
     final encodedLogs =
         state.logs.map((log) => jsonEncode(log.toJson())).toList();
     await prefs.setStringList(_logsKey, encodedLogs);
+
+    final encodedUrgeSessions = state.urgeSessions
+        .map((session) => jsonEncode(session.toJson()))
+        .toList();
+    await prefs.setStringList(_urgeSessionsKey, encodedUrgeSessions);
 
     await prefs.setBool(
       _dailyCheckInEnabledKey,

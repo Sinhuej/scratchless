@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+
+import '../../../app/app_theme.dart';
+import '../../../core/services/weekly_summary_service.dart';
+
+class SimpleSpendChart extends StatelessWidget {
+  final List<DailySpendPoint> points;
+
+  const SimpleSpendChart({
+    super.key,
+    required this.points,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final maxAmount = points.isEmpty
+        ? 0.0
+        : points
+            .map((point) => point.amount)
+            .reduce((a, b) => a > b ? a : b);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: points.map((point) {
+        final ratio = maxAmount <= 0 ? 0.0 : point.amount / maxAmount;
+        final barHeight = maxAmount <= 0 ? 6.0 : 12 + (ratio * 96);
+
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  point.amount > 0
+                      ? '\$${point.amount.toStringAsFixed(0)}'
+                      : '',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.mutedText,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  height: barHeight,
+                  decoration: BoxDecoration(
+                    color: point.amount > 0
+                        ? AppTheme.accent
+                        : Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _dayLabel(point.day.weekday),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.mutedText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  static String _dayLabel(int weekday) {
+    switch (weekday) {
+      case DateTime.monday:
+        return 'M';
+      case DateTime.tuesday:
+        return 'T';
+      case DateTime.wednesday:
+        return 'W';
+      case DateTime.thursday:
+        return 'T';
+      case DateTime.friday:
+        return 'F';
+      case DateTime.saturday:
+        return 'S';
+      case DateTime.sunday:
+        return 'S';
+      default:
+        return '?';
+    }
+  }
+}

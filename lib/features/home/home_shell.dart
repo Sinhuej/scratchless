@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/reminder_settings.dart';
+import '../../core/services/weekly_summary_service.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../profile/profile_screen.dart';
 import '../stats/stats_screen.dart';
@@ -19,6 +20,7 @@ class HomeShell extends StatefulWidget {
   final String goal;
   final List<PurchaseLog> logs;
   final ReminderSettings reminderSettings;
+  final WeeklySummary weeklySummary;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final VoidCallback onCompleteUrgeSession;
@@ -37,6 +39,7 @@ class HomeShell extends StatefulWidget {
     required this.goal,
     required this.logs,
     required this.reminderSettings,
+    required this.weeklySummary,
     required this.onLogPurchase,
     required this.onCompleteUrgeSession,
     required this.onUpdateReminderSettings,
@@ -61,6 +64,7 @@ class _HomeShellState extends State<HomeShell> {
         totalSpent: widget.totalSpent,
         monthlySpendEstimate: widget.monthlySpendEstimate,
         logs: widget.logs,
+        weeklySummary: widget.weeklySummary,
         onLogPurchase: widget.onLogPurchase,
         onCompleteUrgeSession: widget.onCompleteUrgeSession,
       ),
@@ -70,6 +74,7 @@ class _HomeShellState extends State<HomeShell> {
         bestStreakDays: widget.bestStreakDays,
         monthlySpendEstimate: widget.monthlySpendEstimate,
         estimatedCashKept: widget.estimatedCashKept,
+        weeklySummary: widget.weeklySummary,
       ),
       ProfileScreen(
         goal: widget.goal,
