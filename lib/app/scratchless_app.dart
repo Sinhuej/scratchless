@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
+import '../core/services/local_notification_service.dart';
 import '../core/services/streak_service.dart';
 import '../core/storage/app_storage.dart';
 import '../features/home/home_shell.dart';
@@ -31,7 +32,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   @override
   void initState() {
     super.initState();
-    _loadSavedState();
+    _bootstrap();
   }
 
   double get _monthlySpendEstimate {
@@ -60,7 +61,8 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     );
   }
 
-  Future<void> _loadSavedState() async {
+  Future<void> _bootstrap() async {
+    await LocalNotificationService.instance.initialize();
     final stored = await AppStorage.load();
 
     if (!mounted) {
@@ -137,6 +139,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     });
 
     _persistState();
+    LocalNotificationService.instance.syncReminderSettings(settings);
   }
 
   @override

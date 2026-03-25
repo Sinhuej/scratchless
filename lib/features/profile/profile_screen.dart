@@ -144,7 +144,7 @@ class ProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Reminder scaffolding',
+                  'Reminders',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 13,
@@ -153,7 +153,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'These settings save now. Actual notification delivery comes in a later step.',
+                  'These now schedule real local reminders after permission is granted.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
@@ -195,7 +195,7 @@ class ProfileScreen extends StatelessWidget {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Evening support reminder'),
-                  subtitle: const Text('Scaffold a future reminder during common risk hours.'),
+                  subtitle: const Text('Daily 7:00 PM pause-first reminder.'),
                   value: reminderSettings.eveningSupportEnabled,
                   onChanged: (value) {
                     onUpdateReminderSettings(
@@ -214,7 +214,7 @@ class ProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Step 4 notes',
+                  'Step 5 notes',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 13,
@@ -223,7 +223,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Quick trigger tags make logging easier and improve insight quality without forcing long notes.',
+                  'Reminders now deliver locally on-device once permission is granted.',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -231,7 +231,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Reminder settings are saved now so notification delivery can be added cleanly in a later step.',
+                  'Daily check-in uses the selected hour. Evening support is fixed at 7:00 PM for now.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
