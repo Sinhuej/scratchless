@@ -62,8 +62,8 @@ class ThirtyDayInsightService {
 
     final purchaseCount = filteredLogs.length;
 
-    final averagePurchaseAmount =
-        purchaseCount == 0 ? 0 : totalSpent / purchaseCount;
+    final double averagePurchaseAmount =
+        purchaseCount == 0 ? 0.0 : totalSpent / purchaseCount;
 
     return ThirtyDayInsight(
       totalSpent: totalSpent,
