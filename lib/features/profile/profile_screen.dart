@@ -18,6 +18,7 @@ class ProfileScreen extends StatelessWidget {
   final PremiumState premiumState;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
   final VoidCallback onStartPremiumTrial;
+  final VoidCallback onOpenHelp;
 
   const ProfileScreen({
     super.key,
@@ -31,6 +32,7 @@ class ProfileScreen extends StatelessWidget {
     required this.premiumState,
     required this.onUpdateReminderSettings,
     required this.onStartPremiumTrial,
+    required this.onOpenHelp,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -56,6 +58,39 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          AppCard(
+            onTap: onOpenHelp,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Get help now',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Open support options',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Call, text, or chat help when an urge feels too big to handle alone.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           AppCard(
             onTap: () => _openPremiumScreen(context),
             child: Column(

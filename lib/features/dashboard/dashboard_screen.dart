@@ -26,6 +26,7 @@ class DashboardScreen extends StatelessWidget {
       onEditPurchase;
   final void Function(String id) onDeletePurchase;
   final VoidCallback onCompleteUrgeSession;
+  final VoidCallback onOpenHelp;
 
   const DashboardScreen({
     super.key,
@@ -42,6 +43,7 @@ class DashboardScreen extends StatelessWidget {
     required this.onEditPurchase,
     required this.onDeletePurchase,
     required this.onCompleteUrgeSession,
+    required this.onOpenHelp,
   });
 
   void _showEditSheet(BuildContext context, PurchaseLog log) {
@@ -130,6 +132,13 @@ class DashboardScreen extends StatelessWidget {
                 },
               );
             },
+          ),
+          const SizedBox(height: 10),
+          AppButton(
+            label: 'Get help now',
+            isPrimary: false,
+            icon: Icons.support_agent_rounded,
+            onPressed: onOpenHelp,
           ),
           const SizedBox(height: 16),
           AppCard(

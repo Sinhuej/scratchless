@@ -7,6 +7,7 @@ import '../../core/models/reminder_settings.dart';
 import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../help/help_screen.dart';
 import '../profile/profile_screen.dart';
 import '../stats/stats_screen.dart';
 
@@ -67,6 +68,14 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
 
+  void _openHelp() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const HelpScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screens = <Widget>[
@@ -84,6 +93,7 @@ class _HomeShellState extends State<HomeShell> {
         onEditPurchase: widget.onEditPurchase,
         onDeletePurchase: widget.onDeletePurchase,
         onCompleteUrgeSession: widget.onCompleteUrgeSession,
+        onOpenHelp: _openHelp,
       ),
       StatsScreen(
         logs: widget.logs,
@@ -110,6 +120,7 @@ class _HomeShellState extends State<HomeShell> {
         premiumState: widget.premiumState,
         onUpdateReminderSettings: widget.onUpdateReminderSettings,
         onStartPremiumTrial: widget.onStartPremiumTrial,
+        onOpenHelp: _openHelp,
       ),
     ];
 
