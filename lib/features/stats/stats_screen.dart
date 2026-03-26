@@ -6,6 +6,7 @@ import '../../core/models/purchase_log.dart';
 import '../../core/services/feature_gate_service.dart';
 import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
+import '../../features/premium/export_summary_screen.dart';
 import '../../features/premium/premium_history_screen.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../features/premium/weekly_reflection_screen.dart';
@@ -91,6 +92,19 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
+  void _openExportSummaryScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ExportSummaryScreen(
+          weeklySummary: weeklySummary,
+          logs: logs,
+          currentStreakDays: currentStreakDays,
+          bestStreakDays: bestStreakDays,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final totalSpent = logs.fold<double>(
@@ -106,6 +120,8 @@ class StatsScreen extends StatelessWidget {
         FeatureGateService.advancedInsightsUnlocked(premiumState);
     final reflectionUnlocked =
         FeatureGateService.reflectionReportsUnlocked(premiumState);
+    final exportUnlocked =
+        FeatureGateService.exportProgressUnlocked(premiumState);
 
     return Scaffold(
       appBar: AppBar(
@@ -302,6 +318,75 @@ class StatsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   const Text(
                     'Weekly reflection turns raw numbers into guided interpretation in a calmer, more human way.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Unlock Premium',
+                    icon: Icons.lock_open_rounded,
+                    onPressed: () => _openPremiumScreen(context),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: () {
+              if (exportUnlocked) {
+                _openExportSummaryScreen(context);
+              } else {
+                _openPremiumScreen(context);
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Exportable progress summary',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (exportUnlocked) ...[
+                  const Text(
+                    'Your share-ready progress summary is ready.',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Copy a calmer summary for notes, text messages, or accountability check-ins.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Open export summary',
+                    icon: Icons.ios_share_rounded,
+                    onPressed: () => _openExportSummaryScreen(context),
+                  ),
+                ] else ...[
+                  const Text(
+                    'Premium feature',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Export a clean summary of streaks, spending, trigger patterns, and progress for accountability.',
                     style: TextStyle(
                       color: AppTheme.mutedText,
                       fontSize: 14,
