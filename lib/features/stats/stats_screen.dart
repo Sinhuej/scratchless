@@ -8,6 +8,7 @@ import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../features/premium/premium_history_screen.dart';
 import '../../features/premium/premium_screen.dart';
+import '../../features/premium/weekly_reflection_screen.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 import '../logging/purchase_log_sheet.dart';
@@ -79,6 +80,17 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
+  void _openWeeklyReflectionScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => WeeklyReflectionScreen(
+          weeklySummary: weeklySummary,
+          logs: logs,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final totalSpent = logs.fold<double>(
@@ -92,6 +104,8 @@ class StatsScreen extends StatelessWidget {
 
     final advancedUnlocked =
         FeatureGateService.advancedInsightsUnlocked(premiumState);
+    final reflectionUnlocked =
+        FeatureGateService.reflectionReportsUnlocked(premiumState);
 
     return Scaffold(
       appBar: AppBar(
@@ -224,6 +238,75 @@ class StatsScreen extends StatelessWidget {
                   const _LockedLine('30-day trigger breakdown'),
                   const _LockedLine('Longer history view'),
                   const _LockedLine('Weekly reflection report'),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Unlock Premium',
+                    icon: Icons.lock_open_rounded,
+                    onPressed: () => _openPremiumScreen(context),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: () {
+              if (reflectionUnlocked) {
+                _openWeeklyReflectionScreen(context);
+              } else {
+                _openPremiumScreen(context);
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Weekly reflection report',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (reflectionUnlocked) ...[
+                  const Text(
+                    'Your guided weekly reflection is ready.',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Open a calmer interpretation of this week’s spending, triggers, and support signals.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Open weekly reflection',
+                    icon: Icons.auto_awesome_rounded,
+                    onPressed: () => _openWeeklyReflectionScreen(context),
+                  ),
+                ] else ...[
+                  const Text(
+                    'Premium feature',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Weekly reflection turns raw numbers into guided interpretation in a calmer, more human way.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   AppButton(
                     label: 'Unlock Premium',
