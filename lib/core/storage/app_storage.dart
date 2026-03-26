@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/accountability_partner.dart';
 import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
@@ -20,6 +21,7 @@ class StoredAppState {
   final List<UrgeSessionLog> urgeSessions;
   final PremiumState premiumState;
   final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
+  final AccountabilityPartner accountabilityPartner;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -33,6 +35,7 @@ class StoredAppState {
     required this.urgeSessions,
     required this.premiumState,
     required this.weeklyReflectionArchive,
+    required this.accountabilityPartner,
   });
 
   factory StoredAppState.empty() {
@@ -48,6 +51,7 @@ class StoredAppState {
       urgeSessions: const <UrgeSessionLog>[],
       premiumState: PremiumState.free(),
       weeklyReflectionArchive: const <WeeklyReflectionArchiveItem>[],
+      accountabilityPartner: AccountabilityPartner.empty(),
     );
   }
 }
@@ -69,6 +73,8 @@ class AppStorage {
 
   static const String _isPremiumKey = 'is_premium';
   static const String _trialStartedAtKey = 'trial_started_at';
+
+  static const String _accountabilityPartnerKey = 'accountability_partner';
 
   static Future<StoredAppState> load() async {
     try {
@@ -106,6 +112,13 @@ class AppStorage {
           ? null
           : DateTime.tryParse(trialStartedAtRaw);
 
+      final accountabilityRaw = prefs.getString(_accountabilityPartnerKey);
+      final accountabilityPartner = accountabilityRaw == null
+          ? AccountabilityPartner.empty()
+          : AccountabilityPartner.fromJson(
+              jsonDecode(accountabilityRaw) as Map<String, dynamic>,
+            );
+
       return StoredAppState(
         isOnboarded: prefs.getBool(_isOnboardedKey) ?? false,
         startedAt: startedAt,
@@ -128,6 +141,7 @@ class AppStorage {
           trialStartedAt: trialStartedAt,
         ),
         weeklyReflectionArchive: weeklyReflectionArchive,
+        accountabilityPartner: accountabilityPartner,
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -190,5 +204,10 @@ class AppStorage {
     } else {
       await prefs.remove(_trialStartedAtKey);
     }
+
+    await prefs.setString(
+      _accountabilityPartnerKey,
+      jsonEncode(state.accountabilityPartner.toJson()),
+    );
   }
 }

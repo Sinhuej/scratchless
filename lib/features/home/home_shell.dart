@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/reminder_settings.dart';
 import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/weekly_summary_service.dart';
+import '../accountability/accountability_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../help/help_screen.dart';
 import '../profile/profile_screen.dart';
@@ -26,6 +28,7 @@ class HomeShell extends StatefulWidget {
   final WeeklySummary weeklySummary;
   final PremiumState premiumState;
   final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
+  final AccountabilityPartner accountabilityPartner;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -35,6 +38,7 @@ class HomeShell extends StatefulWidget {
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
   final VoidCallback onStartPremiumTrial;
   final VoidCallback onSaveWeeklyReflectionToHistory;
+  final ValueChanged<AccountabilityPartner> onUpdateAccountabilityPartner;
 
   const HomeShell({
     super.key,
@@ -52,6 +56,7 @@ class HomeShell extends StatefulWidget {
     required this.weeklySummary,
     required this.premiumState,
     required this.weeklyReflectionArchive,
+    required this.accountabilityPartner,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
@@ -59,6 +64,7 @@ class HomeShell extends StatefulWidget {
     required this.onUpdateReminderSettings,
     required this.onStartPremiumTrial,
     required this.onSaveWeeklyReflectionToHistory,
+    required this.onUpdateAccountabilityPartner,
   });
 
   @override
@@ -72,6 +78,21 @@ class _HomeShellState extends State<HomeShell> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => const HelpScreen(),
+      ),
+    );
+  }
+
+  void _openAccountability() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => AccountabilityScreen(
+          partner: widget.accountabilityPartner,
+          onSavePartner: widget.onUpdateAccountabilityPartner,
+          weeklySummary: widget.weeklySummary,
+          logs: widget.logs,
+          currentStreakDays: widget.currentStreakDays,
+          bestStreakDays: widget.bestStreakDays,
+        ),
       ),
     );
   }
@@ -118,9 +139,11 @@ class _HomeShellState extends State<HomeShell> {
         bestStreakDays: widget.bestStreakDays,
         reminderSettings: widget.reminderSettings,
         premiumState: widget.premiumState,
+        accountabilityPartner: widget.accountabilityPartner,
         onUpdateReminderSettings: widget.onUpdateReminderSettings,
         onStartPremiumTrial: widget.onStartPremiumTrial,
         onOpenHelp: _openHelp,
+        onOpenAccountability: _openAccountability,
       ),
     ];
 

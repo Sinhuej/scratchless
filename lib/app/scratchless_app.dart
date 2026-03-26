@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/models/accountability_partner.dart';
 import '../core/models/premium_state.dart';
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
@@ -37,6 +38,8 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   PremiumState _premiumState = PremiumState.free();
   List<WeeklyReflectionArchiveItem> _weeklyReflectionArchive =
       <WeeklyReflectionArchiveItem>[];
+  AccountabilityPartner _accountabilityPartner =
+      AccountabilityPartner.empty();
 
   @override
   void initState() {
@@ -99,6 +102,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _urgeSessions = stored.urgeSessions;
       _premiumState = stored.premiumState;
       _weeklyReflectionArchive = stored.weeklyReflectionArchive;
+      _accountabilityPartner = stored.accountabilityPartner;
     });
   }
 
@@ -116,6 +120,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         urgeSessions: _urgeSessions,
         premiumState: _premiumState,
         weeklyReflectionArchive: _weeklyReflectionArchive,
+        accountabilityPartner: _accountabilityPartner,
       ),
     );
   }
@@ -253,6 +258,14 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
+  void _updateAccountabilityPartner(AccountabilityPartner partner) {
+    setState(() {
+      _accountabilityPartner = partner;
+    });
+
+    _persistState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -277,6 +290,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   weeklySummary: _weeklySummary,
                   premiumState: _premiumState,
                   weeklyReflectionArchive: _weeklyReflectionArchive,
+                  accountabilityPartner: _accountabilityPartner,
                   onLogPurchase: _logPurchase,
                   onEditPurchase: _editPurchase,
                   onDeletePurchase: _deletePurchase,
@@ -284,6 +298,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   onUpdateReminderSettings: _updateReminderSettings,
                   onStartPremiumTrial: _startPremiumTrial,
                   onSaveWeeklyReflectionToHistory: _saveWeeklyReflectionToHistory,
+                  onUpdateAccountabilityPartner: _updateAccountabilityPartner,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,

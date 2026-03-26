@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/reminder_settings.dart';
 import '../../core/services/feature_gate_service.dart';
@@ -16,9 +17,11 @@ class ProfileScreen extends StatelessWidget {
   final int bestStreakDays;
   final ReminderSettings reminderSettings;
   final PremiumState premiumState;
+  final AccountabilityPartner accountabilityPartner;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
   final VoidCallback onStartPremiumTrial;
   final VoidCallback onOpenHelp;
+  final VoidCallback onOpenAccountability;
 
   const ProfileScreen({
     super.key,
@@ -30,9 +33,11 @@ class ProfileScreen extends StatelessWidget {
     required this.bestStreakDays,
     required this.reminderSettings,
     required this.premiumState,
+    required this.accountabilityPartner,
     required this.onUpdateReminderSettings,
     required this.onStartPremiumTrial,
     required this.onOpenHelp,
+    required this.onOpenAccountability,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -83,6 +88,43 @@ class ProfileScreen extends StatelessWidget {
                 Text(
                   'Call, text, or chat help when an urge feels too big to handle alone.',
                   style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenAccountability,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Accountability partner',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  accountabilityPartner.hasName
+                      ? accountabilityPartner.name
+                      : 'Set up accountability',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  accountabilityPartner.hasName
+                      ? 'Save quick check-in, support, and progress-sharing messages for a trusted person.'
+                      : 'Save one trusted person and use ready-to-send support and accountability messages.',
+                  style: const TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
                   ),
