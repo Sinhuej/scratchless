@@ -4,16 +4,19 @@ import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/services/weekly_reflection_service.dart';
 import '../../core/services/weekly_summary_service.dart';
+import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 
 class WeeklyReflectionScreen extends StatelessWidget {
   final WeeklySummary weeklySummary;
   final List<PurchaseLog> logs;
+  final VoidCallback onSaveToHistory;
 
   const WeeklyReflectionScreen({
     super.key,
     required this.weeklySummary,
     required this.logs,
+    required this.onSaveToHistory,
   });
 
   @override
@@ -57,6 +60,19 @@ class WeeklyReflectionScreen extends StatelessWidget {
                     color: AppTheme.mutedText,
                     fontSize: 14,
                   ),
+                ),
+                const SizedBox(height: 16),
+                AppButton(
+                  label: 'Save to reflection history',
+                  icon: Icons.bookmark_add_rounded,
+                  onPressed: () {
+                    onSaveToHistory();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Weekly reflection saved to history'),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

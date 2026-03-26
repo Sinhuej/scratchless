@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/feature_gate_service.dart';
 import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../features/premium/export_summary_screen.dart';
 import '../../features/premium/premium_history_screen.dart';
 import '../../features/premium/premium_screen.dart';
+import '../../features/premium/weekly_reflection_archive_screen.dart';
 import '../../features/premium/weekly_reflection_screen.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
@@ -23,7 +25,9 @@ class StatsScreen extends StatelessWidget {
   final double estimatedCashKept;
   final WeeklySummary weeklySummary;
   final PremiumState premiumState;
+  final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
   final VoidCallback onStartPremiumTrial;
+  final VoidCallback onSaveWeeklyReflectionToHistory;
   final void Function(String id, double amount, String? note, List<String> tags)
       onEditPurchase;
   final void Function(String id) onDeletePurchase;
@@ -37,7 +41,9 @@ class StatsScreen extends StatelessWidget {
     required this.estimatedCashKept,
     required this.weeklySummary,
     required this.premiumState,
+    required this.weeklyReflectionArchive,
     required this.onStartPremiumTrial,
+    required this.onSaveWeeklyReflectionToHistory,
     required this.onEditPurchase,
     required this.onDeletePurchase,
   });
@@ -87,6 +93,17 @@ class StatsScreen extends StatelessWidget {
         builder: (_) => WeeklyReflectionScreen(
           weeklySummary: weeklySummary,
           logs: logs,
+          onSaveToHistory: onSaveWeeklyReflectionToHistory,
+        ),
+      ),
+    );
+  }
+
+  void _openWeeklyReflectionArchiveScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => WeeklyReflectionArchiveScreen(
+          archive: weeklyReflectionArchive,
         ),
       ),
     );
@@ -318,6 +335,75 @@ class StatsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   const Text(
                     'Weekly reflection turns raw numbers into guided interpretation in a calmer, more human way.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Unlock Premium',
+                    icon: Icons.lock_open_rounded,
+                    onPressed: () => _openPremiumScreen(context),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: () {
+              if (reflectionUnlocked) {
+                _openWeeklyReflectionArchiveScreen(context);
+              } else {
+                _openPremiumScreen(context);
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Weekly reflection history',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (reflectionUnlocked) ...[
+                  Text(
+                    '${weeklyReflectionArchive.length} saved reflection${weeklyReflectionArchive.length == 1 ? '' : 's'}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Save weekly reflections and reopen older weeks later for continuity and accountability.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Open reflection history',
+                    icon: Icons.history_rounded,
+                    onPressed: () => _openWeeklyReflectionArchiveScreen(context),
+                  ),
+                ] else ...[
+                  const Text(
+                    'Premium feature',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Build a saved archive of weekly reflections you can reopen over time.',
                     style: TextStyle(
                       color: AppTheme.mutedText,
                       fontSize: 14,

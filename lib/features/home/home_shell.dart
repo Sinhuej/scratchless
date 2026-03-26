@@ -4,6 +4,7 @@ import '../../app/app_theme.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/reminder_settings.dart';
+import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../profile/profile_screen.dart';
@@ -23,6 +24,7 @@ class HomeShell extends StatefulWidget {
   final ReminderSettings reminderSettings;
   final WeeklySummary weeklySummary;
   final PremiumState premiumState;
+  final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -31,6 +33,7 @@ class HomeShell extends StatefulWidget {
   final VoidCallback onCompleteUrgeSession;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
   final VoidCallback onStartPremiumTrial;
+  final VoidCallback onSaveWeeklyReflectionToHistory;
 
   const HomeShell({
     super.key,
@@ -47,12 +50,14 @@ class HomeShell extends StatefulWidget {
     required this.reminderSettings,
     required this.weeklySummary,
     required this.premiumState,
+    required this.weeklyReflectionArchive,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
     required this.onCompleteUrgeSession,
     required this.onUpdateReminderSettings,
     required this.onStartPremiumTrial,
+    required this.onSaveWeeklyReflectionToHistory,
   });
 
   @override
@@ -88,7 +93,9 @@ class _HomeShellState extends State<HomeShell> {
         estimatedCashKept: widget.estimatedCashKept,
         weeklySummary: widget.weeklySummary,
         premiumState: widget.premiumState,
+        weeklyReflectionArchive: widget.weeklyReflectionArchive,
         onStartPremiumTrial: widget.onStartPremiumTrial,
+        onSaveWeeklyReflectionToHistory: widget.onSaveWeeklyReflectionToHistory,
         onEditPurchase: widget.onEditPurchase,
         onDeletePurchase: widget.onDeletePurchase,
       ),

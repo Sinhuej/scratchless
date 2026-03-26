@@ -6,6 +6,7 @@ import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
 import '../models/urge_session_log.dart';
+import '../models/weekly_reflection_archive_item.dart';
 
 class StoredAppState {
   final bool isOnboarded;
@@ -18,6 +19,7 @@ class StoredAppState {
   final ReminderSettings reminderSettings;
   final List<UrgeSessionLog> urgeSessions;
   final PremiumState premiumState;
+  final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -30,6 +32,7 @@ class StoredAppState {
     required this.reminderSettings,
     required this.urgeSessions,
     required this.premiumState,
+    required this.weeklyReflectionArchive,
   });
 
   factory StoredAppState.empty() {
@@ -44,6 +47,7 @@ class StoredAppState {
       reminderSettings: ReminderSettings.defaults(),
       urgeSessions: const <UrgeSessionLog>[],
       premiumState: PremiumState.free(),
+      weeklyReflectionArchive: const <WeeklyReflectionArchiveItem>[],
     );
   }
 }
@@ -57,6 +61,7 @@ class AppStorage {
   static const String _urgesDefeatedKey = 'urges_defeated';
   static const String _logsKey = 'purchase_logs';
   static const String _urgeSessionsKey = 'urge_sessions';
+  static const String _weeklyReflectionArchiveKey = 'weekly_reflection_archive';
 
   static const String _dailyCheckInEnabledKey = 'daily_check_in_enabled';
   static const String _eveningSupportEnabledKey = 'evening_support_enabled';
@@ -88,6 +93,14 @@ class AppStorage {
       }).toList()
         ..sort((a, b) => b.completedAt.compareTo(a.completedAt));
 
+      final rawArchive =
+          prefs.getStringList(_weeklyReflectionArchiveKey) ?? <String>[];
+      final weeklyReflectionArchive = rawArchive.map((raw) {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        return WeeklyReflectionArchiveItem.fromJson(decoded);
+      }).toList()
+        ..sort((a, b) => b.weekEnding.compareTo(a.weekEnding));
+
       final trialStartedAtRaw = prefs.getString(_trialStartedAtKey);
       final trialStartedAt = trialStartedAtRaw == null
           ? null
@@ -114,6 +127,7 @@ class AppStorage {
           isPremium: prefs.getBool(_isPremiumKey) ?? false,
           trialStartedAt: trialStartedAt,
         ),
+        weeklyReflectionArchive: weeklyReflectionArchive,
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -147,6 +161,11 @@ class AppStorage {
         .map((session) => jsonEncode(session.toJson()))
         .toList();
     await prefs.setStringList(_urgeSessionsKey, encodedUrgeSessions);
+
+    final encodedArchive = state.weeklyReflectionArchive
+        .map((item) => jsonEncode(item.toJson()))
+        .toList();
+    await prefs.setStringList(_weeklyReflectionArchiveKey, encodedArchive);
 
     await prefs.setBool(
       _dailyCheckInEnabledKey,
