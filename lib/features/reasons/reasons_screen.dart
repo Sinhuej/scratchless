@@ -5,7 +5,7 @@ import '../../core/models/stop_reason.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 
-class ReasonsScreen extends StatelessWidget {
+class ReasonsScreen extends StatefulWidget {
   final List<StopReason> reasons;
   final ValueChanged<String> onAddReason;
   final void Function(String id, String text) onEditReason;
@@ -19,6 +19,11 @@ class ReasonsScreen extends StatelessWidget {
     required this.onDeleteReason,
   });
 
+  @override
+  State<ReasonsScreen> createState() => _ReasonsScreenState();
+}
+
+class _ReasonsScreenState extends State<ReasonsScreen> {
   static const List<String> _starterReasons = <String>[
     'I want to keep more money for real life.',
     'I do not want one ticket to turn into a spiral.',
@@ -26,6 +31,22 @@ class ReasonsScreen extends StatelessWidget {
     'I am tired of feeling regret after buying.',
     'My future matters more than this moment.',
   ];
+
+  late List<StopReason> _reasons;
+
+  @override
+  void initState() {
+    super.initState();
+    _reasons = List<StopReason>.from(widget.reasons);
+  }
+
+  @override
+  void didUpdateWidget(covariant ReasonsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.reasons != widget.reasons) {
+      _reasons = List<StopReason>.from(widget.reasons);
+    }
+  }
 
   Future<void> _showReasonSheet(
     BuildContext context, {
@@ -85,9 +106,27 @@ class ReasonsScreen extends StatelessWidget {
     }
 
     if (existing == null) {
-      onAddReason(result);
+      final newReason = StopReason(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        text: result,
+      );
+
+      setState(() {
+        _reasons = [newReason, ..._reasons];
+      });
+
+      widget.onAddReason(result);
     } else {
-      onEditReason(existing.id, result);
+      setState(() {
+        _reasons = _reasons.map((reason) {
+          if (reason.id != existing.id) {
+            return reason;
+          }
+          return reason.copyWith(text: result);
+        }).toList();
+      });
+
+      widget.onEditReason(existing.id, result);
     }
   }
 
@@ -119,12 +158,16 @@ class ReasonsScreen extends StatelessWidget {
       return;
     }
 
-    onDeleteReason(reason.id);
+    setState(() {
+      _reasons = _reasons.where((item) => item.id != reason.id).toList();
+    });
+
+    widget.onDeleteReason(reason.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    final displayReasons = reasons.isEmpty
+    final displayReasons = _reasons.isEmpty
         ? _starterReasons
             .map(
               (text) => StopReason(
@@ -133,7 +176,7 @@ class ReasonsScreen extends StatelessWidget {
               ),
             )
             .toList()
-        : reasons;
+        : _reasons;
 
     return Scaffold(
       appBar: AppBar(
@@ -183,7 +226,7 @@ class ReasonsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           ...displayReasons.map((reason) {
-            final isStarterOnly = reasons.isEmpty;
+            final isStarterOnly = _reasons.isEmpty;
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
