@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/models/stop_reason.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
@@ -19,6 +20,7 @@ class DashboardScreen extends StatelessWidget {
   final double totalSpent;
   final double monthlySpendEstimate;
   final List<PurchaseLog> logs;
+  final List<StopReason> reasons;
   final WeeklySummary weeklySummary;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
@@ -38,6 +40,7 @@ class DashboardScreen extends StatelessWidget {
     required this.totalSpent,
     required this.monthlySpendEstimate,
     required this.logs,
+    required this.reasons,
     required this.weeklySummary,
     required this.onLogPurchase,
     required this.onEditPurchase,
@@ -111,6 +114,7 @@ class DashboardScreen extends StatelessWidget {
                   builder: (_) => UrgeModeScreen(
                     averageSpend: averageSpend,
                     onComplete: onCompleteUrgeSession,
+                    reasons: reasons,
                   ),
                 ),
               );

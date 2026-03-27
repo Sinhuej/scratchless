@@ -132,6 +132,7 @@ class _HomeShellState extends State<HomeShell> {
         totalSpent: widget.totalSpent,
         monthlySpendEstimate: widget.monthlySpendEstimate,
         logs: widget.logs,
+        reasons: widget.stopReasons,
         weeklySummary: widget.weeklySummary,
         onLogPurchase: widget.onLogPurchase,
         onEditPurchase: widget.onEditPurchase,
