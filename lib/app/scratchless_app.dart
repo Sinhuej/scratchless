@@ -270,28 +270,25 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
-  void _addStopReason(String text) {
+  void _addStopReason(StopReason reason) {
     setState(() {
       _stopReasons = [
-        StopReason(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          text: text,
-        ),
-        ..._stopReasons,
+        reason,
+        ..._stopReasons.where((item) => item.id != reason.id),
       ];
     });
 
     _persistState();
   }
 
-  void _editStopReason(String id, String text) {
+  void _editStopReason(StopReason reason) {
     setState(() {
-      _stopReasons = _stopReasons.map((reason) {
-        if (reason.id != id) {
-          return reason;
+      _stopReasons = _stopReasons.map((item) {
+        if (item.id != reason.id) {
+          return item;
         }
 
-        return reason.copyWith(text: text);
+        return reason;
       }).toList();
     });
 

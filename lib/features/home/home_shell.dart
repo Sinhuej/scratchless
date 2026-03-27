@@ -42,8 +42,8 @@ class HomeShell extends StatefulWidget {
   final VoidCallback onStartPremiumTrial;
   final VoidCallback onSaveWeeklyReflectionToHistory;
   final ValueChanged<AccountabilityPartner> onUpdateAccountabilityPartner;
-  final ValueChanged<String> onAddStopReason;
-  final void Function(String id, String text) onEditStopReason;
+  final ValueChanged<StopReason> onAddStopReason;
+  final ValueChanged<StopReason> onEditStopReason;
   final void Function(String id) onDeleteStopReason;
 
   const HomeShell({

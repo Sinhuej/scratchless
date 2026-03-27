@@ -7,8 +7,8 @@ import '../../shared/widgets/app_card.dart';
 
 class ReasonsScreen extends StatefulWidget {
   final List<StopReason> reasons;
-  final ValueChanged<String> onAddReason;
-  final void Function(String id, String text) onEditReason;
+  final ValueChanged<StopReason> onAddReason;
+  final ValueChanged<StopReason> onEditReason;
   final void Function(String id) onDeleteReason;
 
   const ReasonsScreen({
@@ -115,18 +115,20 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
         _reasons = [newReason, ..._reasons];
       });
 
-      widget.onAddReason(result);
+      widget.onAddReason(newReason);
     } else {
+      final updatedReason = existing.copyWith(text: result);
+
       setState(() {
         _reasons = _reasons.map((reason) {
           if (reason.id != existing.id) {
             return reason;
           }
-          return reason.copyWith(text: result);
+          return updatedReason;
         }).toList();
       });
 
-      widget.onEditReason(existing.id, result);
+      widget.onEditReason(updatedReason);
     }
   }
 
