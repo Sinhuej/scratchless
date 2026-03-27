@@ -32,20 +32,12 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
     'My future matters more than this moment.',
   ];
 
-  late List<StopReason> _reasons;
+  late final List<StopReason> _reasons;
 
   @override
   void initState() {
     super.initState();
     _reasons = List<StopReason>.from(widget.reasons);
-  }
-
-  @override
-  void didUpdateWidget(covariant ReasonsScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.reasons != widget.reasons) {
-      _reasons = List<StopReason>.from(widget.reasons);
-    }
   }
 
   Future<void> _showReasonSheet(
@@ -101,7 +93,7 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
       },
     );
 
-    if (result == null || result.isEmpty) {
+    if (!mounted || result == null || result.isEmpty) {
       return;
     }
 
@@ -112,24 +104,23 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
       );
 
       setState(() {
-        _reasons = [newReason, ..._reasons];
+        _reasons.insert(0, newReason);
       });
 
       widget.onAddReason(newReason);
-    } else {
-      final updatedReason = existing.copyWith(text: result);
-
-      setState(() {
-        _reasons = _reasons.map((reason) {
-          if (reason.id != existing.id) {
-            return reason;
-          }
-          return updatedReason;
-        }).toList();
-      });
-
-      widget.onEditReason(updatedReason);
+      return;
     }
+
+    final updatedReason = existing.copyWith(text: result);
+
+    setState(() {
+      final index = _reasons.indexWhere((item) => item.id == existing.id);
+      if (index != -1) {
+        _reasons[index] = updatedReason;
+      }
+    });
+
+    widget.onEditReason(updatedReason);
   }
 
   Future<void> _confirmDelete(BuildContext context, StopReason reason) async {
@@ -156,12 +147,12 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
         ) ??
         false;
 
-    if (!confirmed) {
+    if (!confirmed || !mounted) {
       return;
     }
 
     setState(() {
-      _reasons = _reasons.where((item) => item.id != reason.id).toList();
+      _reasons.removeWhere((item) => item.id == reason.id);
     });
 
     widget.onDeleteReason(reason.id);
@@ -169,7 +160,8 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final displayReasons = _reasons.isEmpty
+    final usingStarters = _reasons.isEmpty;
+    final displayReasons = usingStarters
         ? _starterReasons
             .map(
               (text) => StopReason(
@@ -228,19 +220,10 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
           ),
           const SizedBox(height: 12),
           ...displayReasons.map((reason) {
-            final isStarterOnly = _reasons.isEmpty;
-
             return Padding(
+              key: ValueKey(reason.id),
               padding: const EdgeInsets.only(bottom: 12),
               child: AppCard(
-                onTap: isStarterOnly
-                    ? null
-                    : () {
-                        _showReasonSheet(
-                          context,
-                          existing: reason,
-                        );
-                      },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -252,7 +235,7 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (isStarterOnly)
+                    if (usingStarters)
                       const Text(
                         'Starter example — add your own version',
                         style: TextStyle(
@@ -263,21 +246,23 @@ class _ReasonsScreenState extends State<ReasonsScreen> {
                     else
                       Row(
                         children: [
-                          const Expanded(
-                            child: Text(
-                              'Tap to edit',
-                              style: TextStyle(
-                                color: AppTheme.mutedText,
-                                fontSize: 12,
-                              ),
-                            ),
+                          TextButton.icon(
+                            onPressed: () {
+                              _showReasonSheet(
+                                context,
+                                existing: reason,
+                              );
+                            },
+                            icon: const Icon(Icons.edit_rounded),
+                            label: const Text('Edit'),
                           ),
-                          IconButton(
+                          const SizedBox(width: 8),
+                          TextButton.icon(
                             onPressed: () {
                               _confirmDelete(context, reason);
                             },
                             icon: const Icon(Icons.delete_outline_rounded),
-                            visualDensity: VisualDensity.compact,
+                            label: const Text('Delete'),
                           ),
                         ],
                       ),
