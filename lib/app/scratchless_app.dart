@@ -4,6 +4,7 @@ import '../core/models/accountability_partner.dart';
 import '../core/models/premium_state.dart';
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
+import '../core/models/stop_reason.dart';
 import '../core/models/urge_session_log.dart';
 import '../core/models/weekly_reflection_archive_item.dart';
 import '../core/services/local_notification_service.dart';
@@ -40,6 +41,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       <WeeklyReflectionArchiveItem>[];
   AccountabilityPartner _accountabilityPartner =
       AccountabilityPartner.empty();
+  List<StopReason> _stopReasons = <StopReason>[];
 
   @override
   void initState() {
@@ -103,6 +105,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _premiumState = stored.premiumState;
       _weeklyReflectionArchive = stored.weeklyReflectionArchive;
       _accountabilityPartner = stored.accountabilityPartner;
+      _stopReasons = stored.stopReasons;
     });
   }
 
@@ -121,6 +124,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         premiumState: _premiumState,
         weeklyReflectionArchive: _weeklyReflectionArchive,
         accountabilityPartner: _accountabilityPartner,
+        stopReasons: _stopReasons,
       ),
     );
   }
@@ -266,6 +270,42 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
+  void _addStopReason(String text) {
+    setState(() {
+      _stopReasons = [
+        StopReason(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          text: text,
+        ),
+        ..._stopReasons,
+      ];
+    });
+
+    _persistState();
+  }
+
+  void _editStopReason(String id, String text) {
+    setState(() {
+      _stopReasons = _stopReasons.map((reason) {
+        if (reason.id != id) {
+          return reason;
+        }
+
+        return reason.copyWith(text: text);
+      }).toList();
+    });
+
+    _persistState();
+  }
+
+  void _deleteStopReason(String id) {
+    setState(() {
+      _stopReasons = _stopReasons.where((reason) => reason.id != id).toList();
+    });
+
+    _persistState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -291,6 +331,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   premiumState: _premiumState,
                   weeklyReflectionArchive: _weeklyReflectionArchive,
                   accountabilityPartner: _accountabilityPartner,
+                  stopReasons: _stopReasons,
                   onLogPurchase: _logPurchase,
                   onEditPurchase: _editPurchase,
                   onDeletePurchase: _deletePurchase,
@@ -299,6 +340,9 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   onStartPremiumTrial: _startPremiumTrial,
                   onSaveWeeklyReflectionToHistory: _saveWeeklyReflectionToHistory,
                   onUpdateAccountabilityPartner: _updateAccountabilityPartner,
+                  onAddStopReason: _addStopReason,
+                  onEditStopReason: _editStopReason,
+                  onDeleteStopReason: _deleteStopReason,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,

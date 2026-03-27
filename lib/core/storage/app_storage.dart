@@ -6,6 +6,7 @@ import '../models/accountability_partner.dart';
 import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
+import '../models/stop_reason.dart';
 import '../models/urge_session_log.dart';
 import '../models/weekly_reflection_archive_item.dart';
 
@@ -22,6 +23,7 @@ class StoredAppState {
   final PremiumState premiumState;
   final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
   final AccountabilityPartner accountabilityPartner;
+  final List<StopReason> stopReasons;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -36,6 +38,7 @@ class StoredAppState {
     required this.premiumState,
     required this.weeklyReflectionArchive,
     required this.accountabilityPartner,
+    required this.stopReasons,
   });
 
   factory StoredAppState.empty() {
@@ -52,6 +55,7 @@ class StoredAppState {
       premiumState: PremiumState.free(),
       weeklyReflectionArchive: const <WeeklyReflectionArchiveItem>[],
       accountabilityPartner: AccountabilityPartner.empty(),
+      stopReasons: const <StopReason>[],
     );
   }
 }
@@ -75,6 +79,7 @@ class AppStorage {
   static const String _trialStartedAtKey = 'trial_started_at';
 
   static const String _accountabilityPartnerKey = 'accountability_partner';
+  static const String _stopReasonsKey = 'stop_reasons';
 
   static Future<StoredAppState> load() async {
     try {
@@ -119,6 +124,12 @@ class AppStorage {
               jsonDecode(accountabilityRaw) as Map<String, dynamic>,
             );
 
+      final rawStopReasons = prefs.getStringList(_stopReasonsKey) ?? <String>[];
+      final stopReasons = rawStopReasons.map((raw) {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        return StopReason.fromJson(decoded);
+      }).toList();
+
       return StoredAppState(
         isOnboarded: prefs.getBool(_isOnboardedKey) ?? false,
         startedAt: startedAt,
@@ -142,6 +153,7 @@ class AppStorage {
         ),
         weeklyReflectionArchive: weeklyReflectionArchive,
         accountabilityPartner: accountabilityPartner,
+        stopReasons: stopReasons,
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -209,5 +221,10 @@ class AppStorage {
       _accountabilityPartnerKey,
       jsonEncode(state.accountabilityPartner.toJson()),
     );
+
+    final encodedStopReasons = state.stopReasons
+        .map((reason) => jsonEncode(reason.toJson()))
+        .toList();
+    await prefs.setStringList(_stopReasonsKey, encodedStopReasons);
   }
 }

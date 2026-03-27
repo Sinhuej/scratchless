@@ -22,6 +22,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onStartPremiumTrial;
   final VoidCallback onOpenHelp;
   final VoidCallback onOpenAccountability;
+  final VoidCallback onOpenReasons;
 
   const ProfileScreen({
     super.key,
@@ -38,6 +39,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onStartPremiumTrial,
     required this.onOpenHelp,
     required this.onOpenAccountability,
+    required this.onOpenReasons,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -87,6 +89,39 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'Call, text, or chat help when an urge feels too big to handle alone.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenReasons,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reasons to stop',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Keep your reasons close',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Save the words you want to hear when the urge gets loud.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,

@@ -5,12 +5,14 @@ import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/reminder_settings.dart';
+import '../../core/models/stop_reason.dart';
 import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../accountability/accountability_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../help/help_screen.dart';
 import '../profile/profile_screen.dart';
+import '../reasons/reasons_screen.dart';
 import '../stats/stats_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -29,6 +31,7 @@ class HomeShell extends StatefulWidget {
   final PremiumState premiumState;
   final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
   final AccountabilityPartner accountabilityPartner;
+  final List<StopReason> stopReasons;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -39,6 +42,9 @@ class HomeShell extends StatefulWidget {
   final VoidCallback onStartPremiumTrial;
   final VoidCallback onSaveWeeklyReflectionToHistory;
   final ValueChanged<AccountabilityPartner> onUpdateAccountabilityPartner;
+  final ValueChanged<String> onAddStopReason;
+  final void Function(String id, String text) onEditStopReason;
+  final void Function(String id) onDeleteStopReason;
 
   const HomeShell({
     super.key,
@@ -57,6 +63,7 @@ class HomeShell extends StatefulWidget {
     required this.premiumState,
     required this.weeklyReflectionArchive,
     required this.accountabilityPartner,
+    required this.stopReasons,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
@@ -65,6 +72,9 @@ class HomeShell extends StatefulWidget {
     required this.onStartPremiumTrial,
     required this.onSaveWeeklyReflectionToHistory,
     required this.onUpdateAccountabilityPartner,
+    required this.onAddStopReason,
+    required this.onEditStopReason,
+    required this.onDeleteStopReason,
   });
 
   @override
@@ -92,6 +102,19 @@ class _HomeShellState extends State<HomeShell> {
           logs: widget.logs,
           currentStreakDays: widget.currentStreakDays,
           bestStreakDays: widget.bestStreakDays,
+        ),
+      ),
+    );
+  }
+
+  void _openReasons() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ReasonsScreen(
+          reasons: widget.stopReasons,
+          onAddReason: widget.onAddStopReason,
+          onEditReason: widget.onEditStopReason,
+          onDeleteReason: widget.onDeleteStopReason,
         ),
       ),
     );
@@ -144,6 +167,7 @@ class _HomeShellState extends State<HomeShell> {
         onStartPremiumTrial: widget.onStartPremiumTrial,
         onOpenHelp: _openHelp,
         onOpenAccountability: _openAccountability,
+        onOpenReasons: _openReasons,
       ),
     ];
 
