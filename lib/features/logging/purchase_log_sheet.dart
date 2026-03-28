@@ -30,10 +30,15 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
     'Stress',
     'Boredom',
     'After work',
-    'Money pressure',
-    'Lonely',
-    'Store stop',
     'Nighttime',
+    'Lonely',
+    'Money pressure',
+    'After paycheck',
+    'Saw a display',
+    'Won recently',
+    'Passing a store',
+    'Routine stop',
+    'Store stop',
   ];
 
   bool get _isEditing => widget.initialLog != null;
@@ -95,8 +100,65 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
     }
   }
 
+  Widget _buildChipSection({
+    required String title,
+    required List<String> tags,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: tags.map((tag) {
+            final isSelected = _selectedTags.contains(tag);
+            return FilterChip(
+              label: Text(tag),
+              selected: isSelected,
+              onSelected: (_) {
+                setState(() {
+                  if (isSelected) {
+                    _selectedTags.remove(tag);
+                  } else {
+                    _selectedTags.add(tag);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    const emotionalTags = <String>[
+      'Stress',
+      'Boredom',
+      'Lonely',
+      'Money pressure',
+      'After work',
+      'Nighttime',
+    ];
+
+    const scratchOffTags = <String>[
+      'After paycheck',
+      'Saw a display',
+      'Won recently',
+      'Passing a store',
+      'Routine stop',
+      'Store stop',
+    ];
+
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -118,6 +180,15 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
                   fontWeight: FontWeight.w900,
                 ),
               ),
+              const SizedBox(height: 8),
+              const Text(
+                'Tap what matches this moment. It does not have to be perfect to be useful.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.white70,
+                ),
+              ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 10,
@@ -136,36 +207,14 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
                 }).toList(),
               ),
               const SizedBox(height: 18),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Quick trigger tags',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+              _buildChipSection(
+                title: 'Emotional / pressure triggers',
+                tags: emotionalTags,
               ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _quickTags.map((tag) {
-                  final isSelected = _selectedTags.contains(tag);
-                  return FilterChip(
-                    label: Text(tag),
-                    selected: isSelected,
-                    onSelected: (_) {
-                      setState(() {
-                        if (isSelected) {
-                          _selectedTags.remove(tag);
-                        } else {
-                          _selectedTags.add(tag);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+              const SizedBox(height: 16),
+              _buildChipSection(
+                title: 'Scratch-off situation triggers',
+                tags: scratchOffTags,
               ),
               const SizedBox(height: 16),
               TextField(
@@ -173,7 +222,7 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
                 maxLines: 2,
                 decoration: const InputDecoration(
                   labelText: 'Optional note',
-                  hintText: 'Stress, boredom, after work...',
+                  hintText: 'After seeing tickets at checkout, felt stressed...',
                 ),
               ),
               const SizedBox(height: 16),
