@@ -9,6 +9,7 @@ import '../../core/models/stop_reason.dart';
 import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../accountability/accountability_screen.dart';
+import '../coping/coping_strategies_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../help/help_screen.dart';
 import '../profile/profile_screen.dart';
@@ -92,6 +93,14 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  void _openCopingStrategies() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const CopingStrategiesScreen(),
+      ),
+    );
+  }
+
   void _openAccountability() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -139,6 +148,7 @@ class _HomeShellState extends State<HomeShell> {
         onDeletePurchase: widget.onDeletePurchase,
         onCompleteUrgeSession: widget.onCompleteUrgeSession,
         onOpenHelp: _openHelp,
+        onOpenCopingStrategies: _openCopingStrategies,
       ),
       StatsScreen(
         logs: widget.logs,
@@ -170,6 +180,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenHelp: _openHelp,
         onOpenAccountability: _openAccountability,
         onOpenReasons: _openReasons,
+        onOpenCopingStrategies: _openCopingStrategies,
       ),
     ];
 

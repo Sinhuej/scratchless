@@ -29,6 +29,7 @@ class DashboardScreen extends StatelessWidget {
   final void Function(String id) onDeletePurchase;
   final VoidCallback onCompleteUrgeSession;
   final VoidCallback onOpenHelp;
+  final VoidCallback onOpenCopingStrategies;
 
   const DashboardScreen({
     super.key,
@@ -47,6 +48,7 @@ class DashboardScreen extends StatelessWidget {
     required this.onDeletePurchase,
     required this.onCompleteUrgeSession,
     required this.onOpenHelp,
+    required this.onOpenCopingStrategies,
   });
 
   void _showEditSheet(BuildContext context, PurchaseLog log) {
@@ -114,6 +116,7 @@ class DashboardScreen extends StatelessWidget {
                   builder: (_) => UrgeModeScreen(
                     averageSpend: averageSpend,
                     onComplete: onCompleteUrgeSession,
+                    onOpenCopingStrategies: onOpenCopingStrategies,
                     reasons: reasons,
                   ),
                 ),
@@ -143,6 +146,13 @@ class DashboardScreen extends StatelessWidget {
             isPrimary: false,
             icon: Icons.support_agent_rounded,
             onPressed: onOpenHelp,
+          ),
+          const SizedBox(height: 10),
+          AppButton(
+            label: 'Coping strategies',
+            isPrimary: false,
+            icon: Icons.psychology_rounded,
+            onPressed: onOpenCopingStrategies,
           ),
           const SizedBox(height: 16),
           AppCard(

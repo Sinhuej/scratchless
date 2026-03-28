@@ -9,12 +9,14 @@ import '../../shared/widgets/app_card.dart';
 class UrgeModeScreen extends StatefulWidget {
   final double averageSpend;
   final VoidCallback onComplete;
+  final VoidCallback onOpenCopingStrategies;
   final List<StopReason> reasons;
 
   const UrgeModeScreen({
     super.key,
     required this.averageSpend,
     required this.onComplete,
+    required this.onOpenCopingStrategies,
     required this.reasons,
   });
 
@@ -186,6 +188,37 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
                       ),
                     );
                   }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Coping strategies',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Need a next move? Open short strategies for what to do during the urge.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: 'Open coping strategies',
+                  icon: Icons.psychology_rounded,
+                  isPrimary: false,
+                  onPressed: widget.onOpenCopingStrategies,
+                ),
               ],
             ),
           ),

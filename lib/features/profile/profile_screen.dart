@@ -23,6 +23,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenHelp;
   final VoidCallback onOpenAccountability;
   final VoidCallback onOpenReasons;
+  final VoidCallback onOpenCopingStrategies;
 
   const ProfileScreen({
     super.key,
@@ -40,6 +41,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenHelp,
     required this.onOpenAccountability,
     required this.onOpenReasons,
+    required this.onOpenCopingStrategies,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -89,6 +91,39 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'Call, text, or chat help when an urge feels too big to handle alone.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenCopingStrategies,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Coping strategies',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'What to do during the urge',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Open short, practical strategies for slowing the urge down and choosing something else.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
