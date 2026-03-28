@@ -10,6 +10,7 @@ class UrgeModeScreen extends StatefulWidget {
   final double averageSpend;
   final VoidCallback onComplete;
   final VoidCallback onOpenCopingStrategies;
+  final VoidCallback onOpenNearMissEducation;
   final List<StopReason> reasons;
 
   const UrgeModeScreen({
@@ -17,6 +18,7 @@ class UrgeModeScreen extends StatefulWidget {
     required this.averageSpend,
     required this.onComplete,
     required this.onOpenCopingStrategies,
+    required this.onOpenNearMissEducation,
     required this.reasons,
   });
 
@@ -188,6 +190,37 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
                       ),
                     );
                   }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Near-miss psychology',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'If an almost-win is pulling you back in, open the explainer and break the spell a little.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: 'Open near-miss explainer',
+                  icon: Icons.lightbulb_rounded,
+                  isPrimary: false,
+                  onPressed: widget.onOpenNearMissEducation,
+                ),
               ],
             ),
           ),

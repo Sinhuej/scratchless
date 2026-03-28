@@ -30,6 +30,7 @@ class DashboardScreen extends StatelessWidget {
   final VoidCallback onCompleteUrgeSession;
   final VoidCallback onOpenHelp;
   final VoidCallback onOpenCopingStrategies;
+  final VoidCallback onOpenNearMissEducation;
 
   const DashboardScreen({
     super.key,
@@ -49,6 +50,7 @@ class DashboardScreen extends StatelessWidget {
     required this.onCompleteUrgeSession,
     required this.onOpenHelp,
     required this.onOpenCopingStrategies,
+    required this.onOpenNearMissEducation,
   });
 
   void _showEditSheet(BuildContext context, PurchaseLog log) {
@@ -117,6 +119,7 @@ class DashboardScreen extends StatelessWidget {
                     averageSpend: averageSpend,
                     onComplete: onCompleteUrgeSession,
                     onOpenCopingStrategies: onOpenCopingStrategies,
+                    onOpenNearMissEducation: onOpenNearMissEducation,
                     reasons: reasons,
                   ),
                 ),

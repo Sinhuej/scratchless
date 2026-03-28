@@ -11,6 +11,7 @@ import '../../core/services/weekly_summary_service.dart';
 import '../accountability/accountability_screen.dart';
 import '../coping/coping_strategies_screen.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../education/near_miss_screen.dart';
 import '../help/help_screen.dart';
 import '../profile/profile_screen.dart';
 import '../reasons/reasons_screen.dart';
@@ -101,6 +102,14 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  void _openNearMissEducation() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const NearMissScreen(),
+      ),
+    );
+  }
+
   void _openAccountability() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -149,6 +158,7 @@ class _HomeShellState extends State<HomeShell> {
         onCompleteUrgeSession: widget.onCompleteUrgeSession,
         onOpenHelp: _openHelp,
         onOpenCopingStrategies: _openCopingStrategies,
+        onOpenNearMissEducation: _openNearMissEducation,
       ),
       StatsScreen(
         logs: widget.logs,
@@ -181,6 +191,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenAccountability: _openAccountability,
         onOpenReasons: _openReasons,
         onOpenCopingStrategies: _openCopingStrategies,
+        onOpenNearMissEducation: _openNearMissEducation,
       ),
     ];
 

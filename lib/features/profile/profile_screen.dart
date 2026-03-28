@@ -24,6 +24,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenAccountability;
   final VoidCallback onOpenReasons;
   final VoidCallback onOpenCopingStrategies;
+  final VoidCallback onOpenNearMissEducation;
 
   const ProfileScreen({
     super.key,
@@ -42,6 +43,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenAccountability,
     required this.onOpenReasons,
     required this.onOpenCopingStrategies,
+    required this.onOpenNearMissEducation,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -124,6 +126,39 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'Open short, practical strategies for slowing the urge down and choosing something else.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenNearMissEducation,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Near-miss psychology',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Why almost winning can pull you back in',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Open a calm explanation of why near misses can feel powerful even when they still cost you money.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
