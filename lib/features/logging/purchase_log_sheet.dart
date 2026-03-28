@@ -20,26 +20,14 @@ class PurchaseLogSheet extends StatefulWidget {
 }
 
 class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
-  double _selectedAmount = 10;
+  static const List<double> _presetAmounts = <double>[5, 10, 20, 30, 50];
+
+  double? _selectedPresetAmount = 10;
+  bool _useCustomAmount = false;
+
+  final TextEditingController _customAmountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final Set<String> _selectedTags = <String>{};
-
-  static const List<double> _amounts = <double>[5, 10, 20, 30, 50];
-
-  static const List<String> _quickTags = <String>[
-    'Stress',
-    'Boredom',
-    'After work',
-    'Nighttime',
-    'Lonely',
-    'Money pressure',
-    'After paycheck',
-    'Saw a display',
-    'Won recently',
-    'Passing a store',
-    'Routine stop',
-    'Store stop',
-  ];
 
   bool get _isEditing => widget.initialLog != null;
 
@@ -49,7 +37,17 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
 
     final log = widget.initialLog;
     if (log != null) {
-      _selectedAmount = log.amount;
+      final matchesPreset = _presetAmounts.contains(log.amount);
+
+      if (matchesPreset) {
+        _selectedPresetAmount = log.amount;
+        _useCustomAmount = false;
+      } else {
+        _selectedPresetAmount = null;
+        _useCustomAmount = true;
+        _customAmountController.text = _formatCustomAmount(log.amount);
+      }
+
       _noteController.text = log.note ?? '';
       _selectedTags.addAll(log.tags);
     }
@@ -57,8 +55,36 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
 
   @override
   void dispose() {
+    _customAmountController.dispose();
     _noteController.dispose();
     super.dispose();
+  }
+
+  String _formatCustomAmount(double value) {
+    if (value == value.roundToDouble()) {
+      return value.toStringAsFixed(0);
+    }
+    return value.toStringAsFixed(2);
+  }
+
+  double? _resolveAmount() {
+    if (!_useCustomAmount) {
+      return _selectedPresetAmount;
+    }
+
+    final raw = _customAmountController.text.trim();
+    if (raw.isEmpty) {
+      return null;
+    }
+
+    final normalized = raw.replaceAll(',', '');
+    final parsed = double.tryParse(normalized);
+
+    if (parsed == null || parsed <= 0) {
+      return null;
+    }
+
+    return parsed;
   }
 
   Future<void> _confirmDelete() async {
@@ -139,6 +165,31 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
     );
   }
 
+  void _save() {
+    final amount = _resolveAmount();
+
+    if (amount == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a valid amount before saving.'),
+        ),
+      );
+      return;
+    }
+
+    final note = _noteController.text.trim().isEmpty
+        ? null
+        : _noteController.text.trim();
+
+    widget.onSave(
+      amount,
+      note,
+      _selectedTags.toList(),
+    );
+
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     const emotionalTags = <String>[
@@ -193,19 +244,48 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: _amounts.map((amount) {
-                  final isSelected = _selectedAmount == amount;
-                  return ChoiceChip(
-                    label: Text('\$${amount.toStringAsFixed(0)}'),
-                    selected: isSelected,
+                children: [
+                  ..._presetAmounts.map((amount) {
+                    final isSelected =
+                        !_useCustomAmount && _selectedPresetAmount == amount;
+
+                    return ChoiceChip(
+                      label: Text('\$${amount.toStringAsFixed(0)}'),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() {
+                          _useCustomAmount = false;
+                          _selectedPresetAmount = amount;
+                        });
+                      },
+                    );
+                  }),
+                  ChoiceChip(
+                    label: const Text('Other'),
+                    selected: _useCustomAmount,
                     onSelected: (_) {
                       setState(() {
-                        _selectedAmount = amount;
+                        _useCustomAmount = true;
+                        _selectedPresetAmount = null;
                       });
                     },
-                  );
-                }).toList(),
+                  ),
+                ],
               ),
+              if (_useCustomAmount) ...[
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _customAmountController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(
+                    labelText: 'Custom amount',
+                    hintText: 'Enter amount spent',
+                    prefixText: '\$',
+                  ),
+                ),
+              ],
               const SizedBox(height: 18),
               _buildChipSection(
                 title: 'Emotional / pressure triggers',
@@ -229,19 +309,7 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
               AppButton(
                 label: _isEditing ? 'Save changes' : 'Save entry',
                 icon: Icons.check_rounded,
-                onPressed: () {
-                  final note = _noteController.text.trim().isEmpty
-                      ? null
-                      : _noteController.text.trim();
-
-                  widget.onSave(
-                    _selectedAmount,
-                    note,
-                    _selectedTags.toList(),
-                  );
-
-                  Navigator.of(context).pop();
-                },
+                onPressed: _save,
               ),
               if (_isEditing && widget.onDelete != null) ...[
                 const SizedBox(height: 10),
