@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/stop_reason.dart';
+import '../../core/services/money_converter_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 
@@ -56,6 +57,11 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
     final displayReasons = widget.reasons.isEmpty
         ? _starterReasons
         : widget.reasons.take(3).map((reason) => reason.text).toList();
+
+    final converterReport =
+        MoneyConverterService.build(widget.averageSpend);
+
+    final previewComparisons = converterReport.comparisons.take(3).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -126,6 +132,60 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
                     fontSize: 14,
                   ),
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'What that money could buy instead',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (previewComparisons.isEmpty)
+                  const Text(
+                    'No comparison available yet.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  )
+                else
+                  ...previewComparisons.map((comparison) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 5),
+                            child: Icon(
+                              Icons.circle,
+                              size: 8,
+                              color: AppTheme.accent,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              '${comparison.valueText} ${comparison.label}',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
               ],
             ),
           ),

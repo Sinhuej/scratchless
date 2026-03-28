@@ -7,6 +7,7 @@ import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/feature_gate_service.dart';
 import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
+import '../../features/converter/money_converter_screen.dart';
 import '../../features/premium/export_summary_screen.dart';
 import '../../features/premium/premium_history_screen.dart';
 import '../../features/premium/premium_screen.dart';
@@ -21,6 +22,7 @@ class StatsScreen extends StatelessWidget {
   final List<PurchaseLog> logs;
   final int currentStreakDays;
   final int bestStreakDays;
+  final double averageSpend;
   final double monthlySpendEstimate;
   final double estimatedCashKept;
   final WeeklySummary weeklySummary;
@@ -37,6 +39,7 @@ class StatsScreen extends StatelessWidget {
     required this.logs,
     required this.currentStreakDays,
     required this.bestStreakDays,
+    required this.averageSpend,
     required this.monthlySpendEstimate,
     required this.estimatedCashKept,
     required this.weeklySummary,
@@ -117,6 +120,19 @@ class StatsScreen extends StatelessWidget {
           logs: logs,
           currentStreakDays: currentStreakDays,
           bestStreakDays: bestStreakDays,
+        ),
+      ),
+    );
+  }
+
+  void _openMoneyConverterScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MoneyConverterScreen(
+          averageSpend: averageSpend,
+          weeklyCashKept: weeklySummary.cashKeptThisWeek,
+          estimatedCashKept: estimatedCashKept,
+          monthlySpendEstimate: monthlySpendEstimate,
         ),
       ),
     );
@@ -220,6 +236,45 @@ class StatsScreen extends StatelessWidget {
                   child: SimpleSpendChart(
                     points: weeklySummary.spendPoints,
                   ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: () => _openMoneyConverterScreen(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'What that money could buy',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Turn the urge or the saved money into something more real and practical.',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Use a simple comparison view for this urge, this week kept, total kept, or your monthly estimate.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: 'Open money converter',
+                  icon: Icons.compare_arrows_rounded,
+                  onPressed: () => _openMoneyConverterScreen(context),
                 ),
               ],
             ),
