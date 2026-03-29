@@ -7,9 +7,11 @@ import '../../core/models/accountability_partner.dart';
 import '../../core/models/stop_reason.dart';
 import '../../core/services/accountability_message_service.dart';
 import '../../core/services/money_converter_service.dart';
+import '../../core/services/urge_script_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
+import 'urge_scripts_screen.dart';
 
 class UrgeModeScreen extends StatefulWidget {
   final double averageSpend;
@@ -42,6 +44,7 @@ class UrgeModeScreen extends StatefulWidget {
 class _UrgeModeScreenState extends State<UrgeModeScreen> {
   int _secondsLeft = 20;
   bool _completed = false;
+  String _selectedScriptId = UrgeScriptService.defaultScript.id;
 
   static const List<String> _starterReasons = <String>[
     'I want to keep more money for real life.',
@@ -103,6 +106,16 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
     }
   }
 
+  void _openUrgeScripts() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => UrgeScriptsScreen(
+          initialScriptId: _selectedScriptId,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final displayReasons = widget.reasons.isEmpty
@@ -127,6 +140,8 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
     final hasTrustedPerson = widget.accountabilityPartner.hasName;
     final hasPhone = widget.accountabilityPartner.hasPhone;
     final partnerName = widget.accountabilityPartner.name.trim();
+
+    final script = UrgeScriptService.byId(_selectedScriptId);
 
     return Scaffold(
       appBar: AppBar(
@@ -361,6 +376,98 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
                     ),
                   ),
                 ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Which scratch-off pull is this?',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: UrgeScriptService.all.map((item) {
+                    return ChoiceChip(
+                      label: Text(item.chipLabel),
+                      selected: _selectedScriptId == item.id,
+                      onSelected: (_) {
+                        setState(() {
+                          _selectedScriptId = item.id;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  script.title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  script.summary,
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  script.realityCheck,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...script.steps.take(2).map((step) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Icon(
+                            Icons.circle,
+                            size: 8,
+                            color: AppTheme.accent,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            step,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                const SizedBox(height: 10),
+                AppButton(
+                  label: 'Open full urge script',
+                  icon: Icons.menu_book_rounded,
+                  isPrimary: false,
+                  onPressed: _openUrgeScripts,
+                ),
               ],
             ),
           ),

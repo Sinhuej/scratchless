@@ -5,6 +5,7 @@ import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/reminder_settings.dart';
 import '../../features/premium/premium_screen.dart';
+import '../urge/urge_scripts_screen.dart';
 import '../../shared/widgets/app_card.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -48,6 +49,14 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenGoals,
     required this.onOpenMilestones,
   });
+
+  void _openUrgeScriptsScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const UrgeScriptsScreen(),
+      ),
+    );
+  }
 
   void _openPremiumScreen(BuildContext context) {
     Navigator.of(context).push(
@@ -192,6 +201,39 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'Open short, practical strategies for slowing the urge down and choosing something else.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: () => _openUrgeScriptsScreen(context),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Scratch-off urge scripts',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Use situation-based urge scripts',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Open short scripts for payday urges, seeing a display, recent wins, passing a store, and the “only one” trap.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
