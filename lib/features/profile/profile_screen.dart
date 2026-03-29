@@ -25,6 +25,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenCopingStrategies;
   final VoidCallback onOpenNearMissEducation;
   final VoidCallback onOpenGoals;
+  final VoidCallback onOpenMilestones;
 
   const ProfileScreen({
     super.key,
@@ -45,6 +46,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenCopingStrategies,
     required this.onOpenNearMissEducation,
     required this.onOpenGoals,
+    required this.onOpenMilestones,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -67,6 +69,39 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          AppCard(
+            onTap: onOpenMilestones,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Milestones',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Celebrate progress on purpose',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Open your milestone list and reinforce the wins you have actually earned.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           AppCard(
             onTap: onOpenGoals,
             child: const Column(

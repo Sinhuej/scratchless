@@ -4,6 +4,7 @@ import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
+import '../../core/services/milestone_service.dart';
 import '../../core/services/spend_cap_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
@@ -26,6 +27,7 @@ class DashboardScreen extends StatelessWidget {
   final WeeklySummary weeklySummary;
   final SpendCapPlan spendCapPlan;
   final SpendCapProgress spendCapProgress;
+  final MilestoneCardData? celebrationReady;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -36,6 +38,8 @@ class DashboardScreen extends StatelessWidget {
   final VoidCallback onOpenCopingStrategies;
   final VoidCallback onOpenNearMissEducation;
   final VoidCallback onOpenGoals;
+  final VoidCallback onOpenMilestones;
+  final ValueChanged<String> onCelebrateMilestone;
 
   const DashboardScreen({
     super.key,
@@ -51,6 +55,7 @@ class DashboardScreen extends StatelessWidget {
     required this.weeklySummary,
     required this.spendCapPlan,
     required this.spendCapProgress,
+    required this.celebrationReady,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
@@ -59,6 +64,8 @@ class DashboardScreen extends StatelessWidget {
     required this.onOpenCopingStrategies,
     required this.onOpenNearMissEducation,
     required this.onOpenGoals,
+    required this.onOpenMilestones,
+    required this.onCelebrateMilestone,
   });
 
   void _showEditSheet(BuildContext context, PurchaseLog log) {
@@ -162,6 +169,65 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+          if (celebrationReady != null) ...[
+            const SizedBox(height: 12),
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Milestone celebration ready',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    celebrationReady!.title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    celebrationReady!.subtitle,
+                    style: const TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    celebrationReady!.progressLabel,
+                    style: const TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Celebrate this win',
+                    icon: Icons.celebration_rounded,
+                    onPressed: () {
+                      onCelebrateMilestone(celebrationReady!.id);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: onOpenMilestones,
+                      child: const Text('Open milestones'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 18),
           PrimaryUrgeButton(
             onPressed: () {

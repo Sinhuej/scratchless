@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/models/accountability_partner.dart';
+import '../core/models/milestone_state.dart';
 import '../core/models/premium_state.dart';
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
@@ -9,6 +10,7 @@ import '../core/models/stop_reason.dart';
 import '../core/models/urge_session_log.dart';
 import '../core/models/weekly_reflection_archive_item.dart';
 import '../core/services/local_notification_service.dart';
+import '../core/services/milestone_service.dart';
 import '../core/services/spend_cap_service.dart';
 import '../core/services/streak_service.dart';
 import '../core/services/weekly_reflection_service.dart';
@@ -45,6 +47,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       AccountabilityPartner.empty();
   List<StopReason> _stopReasons = <StopReason>[];
   SpendCapPlan _spendCapPlan = SpendCapPlan.defaults();
+  MilestoneState _milestoneState = MilestoneState.empty();
 
   @override
   void initState() {
@@ -93,6 +96,20 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     );
   }
 
+  List<MilestoneCardData> get _milestoneItems {
+    return MilestoneService.buildItems(
+      logs: _logs,
+      urgesDefeated: _urgesDefeated,
+      bestStreakDays: _bestStreakDays,
+      estimatedCashKept: _estimatedCashKept,
+      milestoneState: _milestoneState,
+    );
+  }
+
+  MilestoneCardData? get _celebrationReady {
+    return MilestoneService.firstUncelebrated(_milestoneItems);
+  }
+
   Future<void> _bootstrap() async {
     await LocalNotificationService.instance.initialize();
     final stored = await AppStorage.load();
@@ -117,6 +134,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _accountabilityPartner = stored.accountabilityPartner;
       _stopReasons = stored.stopReasons;
       _spendCapPlan = stored.spendCapPlan;
+      _milestoneState = stored.milestoneState;
     });
   }
 
@@ -137,6 +155,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         accountabilityPartner: _accountabilityPartner,
         stopReasons: _stopReasons,
         spendCapPlan: _spendCapPlan,
+        milestoneState: _milestoneState,
       ),
     );
   }
@@ -322,6 +341,23 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
+  void _celebrateMilestone(String id) {
+    if (_milestoneState.celebratedIds.contains(id)) {
+      return;
+    }
+
+    setState(() {
+      _milestoneState = _milestoneState.copyWith(
+        celebratedIds: [
+          ..._milestoneState.celebratedIds,
+          id,
+        ],
+      );
+    });
+
+    _persistState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -350,6 +386,8 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   stopReasons: _stopReasons,
                   spendCapPlan: _spendCapPlan,
                   spendCapProgress: _spendCapProgress,
+                  milestoneItems: _milestoneItems,
+                  celebrationReady: _celebrationReady,
                   onLogPurchase: _logPurchase,
                   onEditPurchase: _editPurchase,
                   onDeletePurchase: _deletePurchase,
@@ -362,6 +400,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   onEditStopReason: _editStopReason,
                   onDeleteStopReason: _deleteStopReason,
                   onUpdateSpendCapPlan: _updateSpendCapPlan,
+                  onCelebrateMilestone: _celebrateMilestone,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,

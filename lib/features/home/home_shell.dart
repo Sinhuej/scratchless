@@ -8,6 +8,7 @@ import '../../core/models/reminder_settings.dart';
 import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
 import '../../core/models/weekly_reflection_archive_item.dart';
+import '../../core/services/milestone_service.dart';
 import '../../core/services/spend_cap_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../accountability/accountability_screen.dart';
@@ -16,6 +17,7 @@ import '../dashboard/dashboard_screen.dart';
 import '../education/near_miss_screen.dart';
 import '../goals/goals_screen.dart';
 import '../help/help_screen.dart';
+import '../milestones/milestones_screen.dart';
 import '../profile/profile_screen.dart';
 import '../reasons/reasons_screen.dart';
 import '../stats/stats_screen.dart';
@@ -39,6 +41,8 @@ class HomeShell extends StatefulWidget {
   final List<StopReason> stopReasons;
   final SpendCapPlan spendCapPlan;
   final SpendCapProgress spendCapProgress;
+  final List<MilestoneCardData> milestoneItems;
+  final MilestoneCardData? celebrationReady;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -53,6 +57,7 @@ class HomeShell extends StatefulWidget {
   final ValueChanged<StopReason> onEditStopReason;
   final void Function(String id) onDeleteStopReason;
   final ValueChanged<SpendCapPlan> onUpdateSpendCapPlan;
+  final ValueChanged<String> onCelebrateMilestone;
 
   const HomeShell({
     super.key,
@@ -74,6 +79,8 @@ class HomeShell extends StatefulWidget {
     required this.stopReasons,
     required this.spendCapPlan,
     required this.spendCapProgress,
+    required this.milestoneItems,
+    required this.celebrationReady,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
@@ -86,6 +93,7 @@ class HomeShell extends StatefulWidget {
     required this.onEditStopReason,
     required this.onDeleteStopReason,
     required this.onUpdateSpendCapPlan,
+    required this.onCelebrateMilestone,
   });
 
   @override
@@ -126,6 +134,18 @@ class _HomeShellState extends State<HomeShell> {
           plan: widget.spendCapPlan,
           progress: widget.spendCapProgress,
           onSavePlan: widget.onUpdateSpendCapPlan,
+        ),
+      ),
+    );
+  }
+
+  void _openMilestones() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MilestonesScreen(
+          items: widget.milestoneItems,
+          celebrationReady: widget.celebrationReady,
+          onCelebrateMilestone: widget.onCelebrateMilestone,
         ),
       ),
     );
@@ -175,6 +195,7 @@ class _HomeShellState extends State<HomeShell> {
         weeklySummary: widget.weeklySummary,
         spendCapPlan: widget.spendCapPlan,
         spendCapProgress: widget.spendCapProgress,
+        celebrationReady: widget.celebrationReady,
         onLogPurchase: widget.onLogPurchase,
         onEditPurchase: widget.onEditPurchase,
         onDeletePurchase: widget.onDeletePurchase,
@@ -183,6 +204,8 @@ class _HomeShellState extends State<HomeShell> {
         onOpenCopingStrategies: _openCopingStrategies,
         onOpenNearMissEducation: _openNearMissEducation,
         onOpenGoals: _openGoals,
+        onOpenMilestones: _openMilestones,
+        onCelebrateMilestone: widget.onCelebrateMilestone,
       ),
       StatsScreen(
         logs: widget.logs,
@@ -217,6 +240,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenCopingStrategies: _openCopingStrategies,
         onOpenNearMissEducation: _openNearMissEducation,
         onOpenGoals: _openGoals,
+        onOpenMilestones: _openMilestones,
       ),
     ];
 

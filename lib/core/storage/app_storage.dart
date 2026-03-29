@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/accountability_partner.dart';
+import '../models/milestone_state.dart';
 import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
@@ -26,6 +27,7 @@ class StoredAppState {
   final AccountabilityPartner accountabilityPartner;
   final List<StopReason> stopReasons;
   final SpendCapPlan spendCapPlan;
+  final MilestoneState milestoneState;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -42,6 +44,7 @@ class StoredAppState {
     required this.accountabilityPartner,
     required this.stopReasons,
     required this.spendCapPlan,
+    required this.milestoneState,
   });
 
   factory StoredAppState.empty() {
@@ -60,6 +63,7 @@ class StoredAppState {
       accountabilityPartner: AccountabilityPartner.empty(),
       stopReasons: const <StopReason>[],
       spendCapPlan: SpendCapPlan.defaults(),
+      milestoneState: MilestoneState.empty(),
     );
   }
 }
@@ -85,6 +89,7 @@ class AppStorage {
   static const String _accountabilityPartnerKey = 'accountability_partner';
   static const String _stopReasonsKey = 'stop_reasons';
   static const String _spendCapPlanKey = 'spend_cap_plan';
+  static const String _milestoneStateKey = 'milestone_state';
 
   static Future<StoredAppState> load() async {
     try {
@@ -142,6 +147,13 @@ class AppStorage {
               jsonDecode(spendCapPlanRaw) as Map<String, dynamic>,
             );
 
+      final milestoneStateRaw = prefs.getString(_milestoneStateKey);
+      final milestoneState = milestoneStateRaw == null
+          ? MilestoneState.empty()
+          : MilestoneState.fromJson(
+              jsonDecode(milestoneStateRaw) as Map<String, dynamic>,
+            );
+
       return StoredAppState(
         isOnboarded: prefs.getBool(_isOnboardedKey) ?? false,
         startedAt: startedAt,
@@ -167,6 +179,7 @@ class AppStorage {
         accountabilityPartner: accountabilityPartner,
         stopReasons: stopReasons,
         spendCapPlan: spendCapPlan,
+        milestoneState: milestoneState,
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -243,6 +256,11 @@ class AppStorage {
     await prefs.setString(
       _spendCapPlanKey,
       jsonEncode(state.spendCapPlan.toJson()),
+    );
+
+    await prefs.setString(
+      _milestoneStateKey,
+      jsonEncode(state.milestoneState.toJson()),
     );
   }
 }
