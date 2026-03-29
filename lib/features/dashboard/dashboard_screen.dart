@@ -281,6 +281,60 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
           ],
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenMilestones,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Milestones',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  celebrationReady != null
+                      ? 'A new win is ready, and your progress keeps building.'
+                      : 'Keep progress visible, not just problems.',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 18,
+                  runSpacing: 10,
+                  children: [
+                    _metric(
+                      label: 'Streak',
+                      value: '${currentStreakDays}d',
+                    ),
+                    _metric(
+                      label: 'Urge wins',
+                      value: '$urgesDefeated',
+                    ),
+                    _metric(
+                      label: 'Cash kept',
+                      value: '\$${estimatedCashKept.toStringAsFixed(0)}',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Open milestones anytime to review wins and what is coming next.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 18),
           PrimaryUrgeButton(
             onPressed: () {
