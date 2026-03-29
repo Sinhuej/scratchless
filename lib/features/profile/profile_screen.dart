@@ -4,7 +4,6 @@ import '../../app/app_theme.dart';
 import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/reminder_settings.dart';
-import '../../core/services/feature_gate_service.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../shared/widgets/app_card.dart';
 
@@ -25,6 +24,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenReasons;
   final VoidCallback onOpenCopingStrategies;
   final VoidCallback onOpenNearMissEducation;
+  final VoidCallback onOpenGoals;
 
   const ProfileScreen({
     super.key,
@@ -44,6 +44,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenReasons,
     required this.onOpenCopingStrategies,
     required this.onOpenNearMissEducation,
+    required this.onOpenGoals,
   });
 
   void _openPremiumScreen(BuildContext context) {
@@ -59,9 +60,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customReminderUnlocked =
-        FeatureGateService.customReminderSchedulesUnlocked(premiumState);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -69,6 +67,39 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          AppCard(
+            onTap: onOpenGoals,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Goals & spend caps',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Plan spending ahead of time',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Set optional daily and weekly caps so the app can help you spot when things are drifting.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           AppCard(
             onTap: onOpenHelp,
             child: const Column(
@@ -253,7 +284,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  FeatureGateService.premiumStatusLabel(premiumState),
+                  premiumState.isPremium ? 'Premium active' : 'Premium available',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
@@ -262,19 +293,11 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   premiumState.isPremium
-                      ? 'You have access to premium scaffolding and upcoming deeper insight tools.'
-                      : 'Unlock deeper insights, longer history, custom reminder schedules, and more support tools.',
+                      ? 'You have access to premium scaffolding and deeper tools.'
+                      : 'Unlock deeper insights, longer history, custom reminders, and more support tools.',
                   style: const TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Tap to view Premium',
-                  style: TextStyle(
-                    color: AppTheme.mutedText,
-                    fontSize: 12,
                   ),
                 ),
               ],
@@ -384,161 +407,8 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          AppCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Reminders',
-                  style: TextStyle(
-                    color: AppTheme.mutedText,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'These schedule real local reminders after permission is granted.',
-                  style: TextStyle(
-                    color: AppTheme.mutedText,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily check-in reminder'),
-                  subtitle: const Text('Gentle nudge to log how the day went.'),
-                  value: reminderSettings.dailyCheckInEnabled,
-                  onChanged: (value) {
-                    onUpdateReminderSettings(
-                      reminderSettings.copyWith(
-                        dailyCheckInEnabled: value,
-                      ),
-                    );
-                  },
-                ),
-                if (reminderSettings.dailyCheckInEnabled) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Preferred hour',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: const <int>[17, 19, 20, 21].map((hour) {
-                      return _HourChip(hour: hour);
-                    }).toList(),
-                  ),
-                ],
-                const SizedBox(height: 12),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    customReminderUnlocked
-                        ? Icons.lock_open_rounded
-                        : Icons.lock_rounded,
-                  ),
-                  title: const Text('Custom reminder schedules'),
-                  subtitle: Text(
-                    customReminderUnlocked
-                        ? 'Premium scaffold unlocked. Expanded reminder scheduling comes next.'
-                        : 'Premium feature',
-                  ),
-                  onTap: customReminderUnlocked
-                      ? null
-                      : () => _openPremiumScreen(context),
-                ),
-                const SizedBox(height: 8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Evening support reminder'),
-                  subtitle: const Text('Daily 7:00 PM pause-first reminder.'),
-                  value: reminderSettings.eveningSupportEnabled,
-                  onChanged: (value) {
-                    onUpdateReminderSettings(
-                      reminderSettings.copyWith(
-                        eveningSupportEnabled: value,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          const AppCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Step 8 notes',
-                  style: TextStyle(
-                    color: AppTheme.mutedText,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Premium is scaffolded softly here: the core path stays free while deeper tools are positioned as an optional upgrade.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Billing and store purchases come later. This step is about fair structure and feature gating.',
-                  style: TextStyle(
-                    color: AppTheme.mutedText,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
-  }
-}
-
-class _HourChip extends StatelessWidget {
-  final int hour;
-
-  const _HourChip({
-    required this.hour,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final profile =
-        context.findAncestorWidgetOfExactType<ProfileScreen>()!;
-    final selected = profile.reminderSettings.dailyCheckInHour == hour;
-
-    return ChoiceChip(
-      label: Text(_label(hour)),
-      selected: selected,
-      onSelected: (_) {
-        profile.onUpdateReminderSettings(
-          profile.reminderSettings.copyWith(
-            dailyCheckInHour: hour,
-          ),
-        );
-      },
-    );
-  }
-
-  static String _label(int hour) {
-    final suffix = hour >= 12 ? 'PM' : 'AM';
-    final value = hour > 12 ? hour - 12 : hour;
-    return '$value:00 $suffix';
   }
 }

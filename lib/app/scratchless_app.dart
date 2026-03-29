@@ -4,10 +4,12 @@ import '../core/models/accountability_partner.dart';
 import '../core/models/premium_state.dart';
 import '../core/models/purchase_log.dart';
 import '../core/models/reminder_settings.dart';
+import '../core/models/spend_cap_plan.dart';
 import '../core/models/stop_reason.dart';
 import '../core/models/urge_session_log.dart';
 import '../core/models/weekly_reflection_archive_item.dart';
 import '../core/services/local_notification_service.dart';
+import '../core/services/spend_cap_service.dart';
 import '../core/services/streak_service.dart';
 import '../core/services/weekly_reflection_service.dart';
 import '../core/services/weekly_summary_service.dart';
@@ -42,6 +44,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   AccountabilityPartner _accountabilityPartner =
       AccountabilityPartner.empty();
   List<StopReason> _stopReasons = <StopReason>[];
+  SpendCapPlan _spendCapPlan = SpendCapPlan.defaults();
 
   @override
   void initState() {
@@ -83,6 +86,13 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     );
   }
 
+  SpendCapProgress get _spendCapProgress {
+    return SpendCapService.build(
+      logs: _logs,
+      plan: _spendCapPlan,
+    );
+  }
+
   Future<void> _bootstrap() async {
     await LocalNotificationService.instance.initialize();
     final stored = await AppStorage.load();
@@ -106,6 +116,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _weeklyReflectionArchive = stored.weeklyReflectionArchive;
       _accountabilityPartner = stored.accountabilityPartner;
       _stopReasons = stored.stopReasons;
+      _spendCapPlan = stored.spendCapPlan;
     });
   }
 
@@ -125,6 +136,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         weeklyReflectionArchive: _weeklyReflectionArchive,
         accountabilityPartner: _accountabilityPartner,
         stopReasons: _stopReasons,
+        spendCapPlan: _spendCapPlan,
       ),
     );
   }
@@ -287,7 +299,6 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         if (item.id != reason.id) {
           return item;
         }
-
         return reason;
       }).toList();
     });
@@ -298,6 +309,14 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
   void _deleteStopReason(String id) {
     setState(() {
       _stopReasons = _stopReasons.where((reason) => reason.id != id).toList();
+    });
+
+    _persistState();
+  }
+
+  void _updateSpendCapPlan(SpendCapPlan plan) {
+    setState(() {
+      _spendCapPlan = plan;
     });
 
     _persistState();
@@ -329,6 +348,8 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   weeklyReflectionArchive: _weeklyReflectionArchive,
                   accountabilityPartner: _accountabilityPartner,
                   stopReasons: _stopReasons,
+                  spendCapPlan: _spendCapPlan,
+                  spendCapProgress: _spendCapProgress,
                   onLogPurchase: _logPurchase,
                   onEditPurchase: _editPurchase,
                   onDeletePurchase: _deletePurchase,
@@ -340,6 +361,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   onAddStopReason: _addStopReason,
                   onEditStopReason: _editStopReason,
                   onDeleteStopReason: _deleteStopReason,
+                  onUpdateSpendCapPlan: _updateSpendCapPlan,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,

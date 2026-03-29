@@ -6,6 +6,7 @@ import '../models/accountability_partner.dart';
 import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
 import '../models/reminder_settings.dart';
+import '../models/spend_cap_plan.dart';
 import '../models/stop_reason.dart';
 import '../models/urge_session_log.dart';
 import '../models/weekly_reflection_archive_item.dart';
@@ -24,6 +25,7 @@ class StoredAppState {
   final List<WeeklyReflectionArchiveItem> weeklyReflectionArchive;
   final AccountabilityPartner accountabilityPartner;
   final List<StopReason> stopReasons;
+  final SpendCapPlan spendCapPlan;
 
   const StoredAppState({
     required this.isOnboarded,
@@ -39,6 +41,7 @@ class StoredAppState {
     required this.weeklyReflectionArchive,
     required this.accountabilityPartner,
     required this.stopReasons,
+    required this.spendCapPlan,
   });
 
   factory StoredAppState.empty() {
@@ -56,6 +59,7 @@ class StoredAppState {
       weeklyReflectionArchive: const <WeeklyReflectionArchiveItem>[],
       accountabilityPartner: AccountabilityPartner.empty(),
       stopReasons: const <StopReason>[],
+      spendCapPlan: SpendCapPlan.defaults(),
     );
   }
 }
@@ -80,6 +84,7 @@ class AppStorage {
 
   static const String _accountabilityPartnerKey = 'accountability_partner';
   static const String _stopReasonsKey = 'stop_reasons';
+  static const String _spendCapPlanKey = 'spend_cap_plan';
 
   static Future<StoredAppState> load() async {
     try {
@@ -130,6 +135,13 @@ class AppStorage {
         return StopReason.fromJson(decoded);
       }).toList();
 
+      final spendCapPlanRaw = prefs.getString(_spendCapPlanKey);
+      final spendCapPlan = spendCapPlanRaw == null
+          ? SpendCapPlan.defaults()
+          : SpendCapPlan.fromJson(
+              jsonDecode(spendCapPlanRaw) as Map<String, dynamic>,
+            );
+
       return StoredAppState(
         isOnboarded: prefs.getBool(_isOnboardedKey) ?? false,
         startedAt: startedAt,
@@ -154,6 +166,7 @@ class AppStorage {
         weeklyReflectionArchive: weeklyReflectionArchive,
         accountabilityPartner: accountabilityPartner,
         stopReasons: stopReasons,
+        spendCapPlan: spendCapPlan,
       );
     } catch (_) {
       return StoredAppState.empty();
@@ -226,5 +239,10 @@ class AppStorage {
         .map((reason) => jsonEncode(reason.toJson()))
         .toList();
     await prefs.setStringList(_stopReasonsKey, encodedStopReasons);
+
+    await prefs.setString(
+      _spendCapPlanKey,
+      jsonEncode(state.spendCapPlan.toJson()),
+    );
   }
 }

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
+import '../../core/services/spend_cap_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
@@ -22,6 +24,8 @@ class DashboardScreen extends StatelessWidget {
   final List<PurchaseLog> logs;
   final List<StopReason> reasons;
   final WeeklySummary weeklySummary;
+  final SpendCapPlan spendCapPlan;
+  final SpendCapProgress spendCapProgress;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
   final void Function(String id, double amount, String? note, List<String> tags)
@@ -31,6 +35,7 @@ class DashboardScreen extends StatelessWidget {
   final VoidCallback onOpenHelp;
   final VoidCallback onOpenCopingStrategies;
   final VoidCallback onOpenNearMissEducation;
+  final VoidCallback onOpenGoals;
 
   const DashboardScreen({
     super.key,
@@ -44,6 +49,8 @@ class DashboardScreen extends StatelessWidget {
     required this.logs,
     required this.reasons,
     required this.weeklySummary,
+    required this.spendCapPlan,
+    required this.spendCapProgress,
     required this.onLogPurchase,
     required this.onEditPurchase,
     required this.onDeletePurchase,
@@ -51,6 +58,7 @@ class DashboardScreen extends StatelessWidget {
     required this.onOpenHelp,
     required this.onOpenCopingStrategies,
     required this.onOpenNearMissEducation,
+    required this.onOpenGoals,
   });
 
   void _showEditSheet(BuildContext context, PurchaseLog log) {
@@ -109,6 +117,50 @@ class DashboardScreen extends StatelessWidget {
             value: '\$${totalSpent.toStringAsFixed(0)}',
             icon: Icons.receipt_long_rounded,
             subtitle: 'Track honestly. No shame.',
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenGoals,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Spend cap preview',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  spendCapPlan.dailyCapEnabled
+                      ? 'Today: \$${spendCapProgress.todaySpent.toStringAsFixed(0)} / \$${spendCapPlan.dailyCapAmount.toStringAsFixed(0)}'
+                      : 'Daily cap is off',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  spendCapPlan.weeklyCapEnabled
+                      ? 'Week: \$${spendCapProgress.weekSpent.toStringAsFixed(0)} / \$${spendCapPlan.weeklyCapAmount.toStringAsFixed(0)}'
+                      : 'Weekly cap is off',
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: 'Open goals',
+                  icon: Icons.flag_rounded,
+                  isPrimary: false,
+                  onPressed: onOpenGoals,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           PrimaryUrgeButton(
