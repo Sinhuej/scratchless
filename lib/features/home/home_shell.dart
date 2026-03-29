@@ -225,6 +225,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenPreStoreMode: _openPreStoreMode,
         onOpenAccountability: _openAccountability,
         onOpenPreStoreMode: _openPreStoreMode,
+
         onCelebrateMilestone: widget.onCelebrateMilestone,
       ),
       StatsScreen(
@@ -261,6 +262,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenNearMissEducation: _openNearMissEducation,
         onOpenGoals: _openGoals,
         onOpenMilestones: _openMilestones,
+        onOpenPreStoreMode: _openPreStoreMode,
       ),
     ];
 
