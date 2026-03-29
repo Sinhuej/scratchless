@@ -8,6 +8,7 @@ import '../../core/services/feature_gate_service.dart';
 import '../../core/services/trigger_insight_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../features/converter/money_converter_screen.dart';
+import '../../features/stats/real_cost_calculator_screen.dart';
 import '../../features/premium/export_summary_screen.dart';
 import '../../features/premium/premium_history_screen.dart';
 import '../../features/premium/premium_screen.dart';
@@ -138,6 +139,21 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
+  void _openRealCostCalculatorScreen(
+    BuildContext context,
+    double totalSpent,
+  ) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => RealCostCalculatorScreen(
+          weeklySpent: weeklySummary.spentThisWeek,
+          monthlyEstimate: monthlySpendEstimate,
+          totalLogged: totalSpent,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final totalSpent = logs.fold<double>(
@@ -235,6 +251,31 @@ class StatsScreen extends StatelessWidget {
                   height: 150,
                   child: SimpleSpendChart(
                     points: weeklySummary.spendPoints,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: () => _openRealCostCalculatorScreen(context, totalSpent),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'What this habit is really costing',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'See what this week, your total logs, and your projected pattern add up to in real-life tradeoffs.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
                   ),
                 ),
               ],
