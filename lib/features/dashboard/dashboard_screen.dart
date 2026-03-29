@@ -101,6 +101,18 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lastLog = logs.isEmpty ? null : logs.first;
+    final showSpendCapPressureWarning = SpendCapService.hasPressureWarning(
+      plan: spendCapPlan,
+      progress: spendCapProgress,
+    );
+    final spendCapPressureHeadline = SpendCapService.pressureHeadline(
+      plan: spendCapPlan,
+      progress: spendCapProgress,
+    );
+    final spendCapPressureBody = SpendCapService.pressureBody(
+      plan: spendCapPlan,
+      progress: spendCapProgress,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -171,6 +183,33 @@ class DashboardScreen extends StatelessWidget {
                     fontSize: 14,
                   ),
                 ),
+                if (showSpendCapPressureWarning) ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Pressure warning',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    spendCapPressureHeadline,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    spendCapPressureBody,
+                    style: const TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 AppButton(
                   label: 'Open goals',
