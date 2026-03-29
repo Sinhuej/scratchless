@@ -341,6 +341,19 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
+  void _updateGoal(String goal) {
+    final nextGoal = goal.trim();
+    if (nextGoal.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _goal = nextGoal;
+    });
+
+    _persistState();
+  }
+
   void _celebrateMilestone(String id) {
     if (_milestoneState.celebratedIds.contains(id)) {
       return;
@@ -401,6 +414,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   onDeleteStopReason: _deleteStopReason,
                   onUpdateSpendCapPlan: _updateSpendCapPlan,
                   onCelebrateMilestone: _celebrateMilestone,
+                  onUpdateGoal: _updateGoal,
                 )
               : OnboardingScreen(
                   onComplete: _completeOnboarding,

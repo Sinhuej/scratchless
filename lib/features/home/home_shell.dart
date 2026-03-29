@@ -59,6 +59,7 @@ class HomeShell extends StatefulWidget {
   final void Function(String id) onDeleteStopReason;
   final ValueChanged<SpendCapPlan> onUpdateSpendCapPlan;
   final ValueChanged<String> onCelebrateMilestone;
+  final ValueChanged<String> onUpdateGoal;
 
   const HomeShell({
     super.key,
@@ -95,6 +96,7 @@ class HomeShell extends StatefulWidget {
     required this.onDeleteStopReason,
     required this.onUpdateSpendCapPlan,
     required this.onCelebrateMilestone,
+    required this.onUpdateGoal,
   });
 
   @override
@@ -223,6 +225,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenGoals: _openGoals,
         onOpenMilestones: _openMilestones,
         onOpenPreStoreMode: _openPreStoreMode,
+        onUpdateGoal: widget.onUpdateGoal,
         onOpenAccountability: _openAccountability,
 
         onCelebrateMilestone: widget.onCelebrateMilestone,

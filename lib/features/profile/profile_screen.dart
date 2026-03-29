@@ -5,6 +5,7 @@ import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/reminder_settings.dart';
 import '../../features/premium/premium_screen.dart';
+import '../../shared/widgets/app_button.dart';
 import '../urge/urge_scripts_screen.dart';
 import '../../shared/widgets/app_card.dart';
 
@@ -28,6 +29,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenGoals;
   final VoidCallback onOpenMilestones;
   final VoidCallback onOpenPreStoreMode;
+  final ValueChanged<String> onUpdateGoal;
 
   const ProfileScreen({
     super.key,
@@ -50,6 +52,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenGoals,
     required this.onOpenMilestones,
     required this.onOpenPreStoreMode,
+    required this.onUpdateGoal,
   });
 
   void _openUrgeScriptsScreen(BuildContext context) {
@@ -58,6 +61,113 @@ class ProfileScreen extends StatelessWidget {
         builder: (_) => const UrgeScriptsScreen(),
       ),
     );
+  }
+
+  Future<void> _showEditGoalSheet(BuildContext context) async {
+    final controller = TextEditingController(text: goal);
+
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              20,
+              16,
+              16 + MediaQuery.of(sheetContext).viewInsets.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Edit current focus',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Keep it short, honest, and useful for right now.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Current focus',
+                    hintText: 'Stop the spiral before the next ticket',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ActionChip(
+                      label: const Text('Stop the spiral before the next ticket'),
+                      onPressed: () {
+                        controller.text =
+                            'Stop the spiral before the next ticket';
+                      },
+                    ),
+                    ActionChip(
+                      label: const Text('Cut lottery spending without white-knuckling it'),
+                      onPressed: () {
+                        controller.text =
+                            'Cut lottery spending without white-knuckling it';
+                      },
+                    ),
+                    ActionChip(
+                      label: const Text('Keep more cash for real life'),
+                      onPressed: () {
+                        controller.text = 'Keep more cash for real life';
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                AppButton(
+                  label: 'Save focus',
+                  icon: Icons.check_rounded,
+                  onPressed: () {
+                    Navigator.of(sheetContext).pop(controller.text.trim());
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    controller.dispose();
+
+    if (result == null) {
+      return;
+    }
+
+    final nextGoal = result.trim();
+    if (nextGoal.isEmpty || nextGoal == goal) {
+      return;
+    }
+
+    onUpdateGoal(nextGoal);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Current focus updated'),
+        ),
+      );
+    }
   }
 
   void _openPremiumScreen(BuildContext context) {
@@ -417,6 +527,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           AppCard(
+            onTap: () => _showEditGoalSheet(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -438,7 +549,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Progress is still progress. The goal can change later.',
+                  'Progress is still progress. Tap here to change this goal anytime.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,
