@@ -7,8 +7,8 @@ import '../../core/models/reminder_settings.dart';
 import '../../core/services/risky_time_service.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../shared/widgets/app_button.dart';
-import '../urge/urge_scripts_screen.dart';
 import '../../shared/widgets/app_card.dart';
+import '../urge/urge_scripts_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String goal;
@@ -66,9 +66,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showEditGoalSheet(BuildContext context) async {
+  Future<void> _showEditGoalScreen(BuildContext context) async {
     final result = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
+      MaterialPageRoute<String>(
         builder: (_) => _EditGoalScreen(initialGoal: goal),
         fullscreenDialog: true,
       ),
@@ -107,6 +107,10 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final riskyWindowTitle = riskyTimeInsight.hasEnoughData
+        ? 'Detected window: ${riskyTimeInsight.windowLabel} (${riskyTimeInsight.anchorLabel})'
+        : 'Not enough log data yet';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -227,9 +231,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  riskyTimeInsight.hasEnoughData
-                      ? 'Detected window: ${riskyTimeInsight.windowLabel} (${riskyTimeInsight.anchorLabel})'
-                      : 'Not enough log data yet',
+                  riskyWindowTitle,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
@@ -247,7 +249,9 @@ class ProfileScreen extends StatelessWidget {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Show habit-time warnings on Home'),
-                  subtitle: const Text('Surface a warning card near your harder hours.'),
+                  subtitle: const Text(
+                    'Surface a warning card near your harder hours.',
+                  ),
                   value: reminderSettings.habitTimeWarningsEnabled,
                   onChanged: (value) {
                     onUpdateReminderSettings(
@@ -499,7 +503,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           AppCard(
-            onTap: () => _showEditGoalSheet(context),
+            onTap: () => _showEditGoalScreen(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -602,12 +606,99 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Reminders',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'These are separate from risky-time warnings. They drive your actual support reminder settings.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Daily check-in reminder'),
+                  subtitle: const Text('Gentle nudge to log how the day went.'),
+                  value: reminderSettings.dailyCheckInEnabled,
+                  onChanged: (value) {
+                    onUpdateReminderSettings(
+                      reminderSettings.copyWith(
+                        dailyCheckInEnabled: value,
+                      ),
+                    );
+                  },
+                ),
+                if (reminderSettings.dailyCheckInEnabled) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Preferred hour',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [17, 19, 20, 21].map((hour) {
+                      final selected =
+                          reminderSettings.dailyCheckInHour == hour;
+                      final suffix = hour >= 12 ? 'PM' : 'AM';
+                      final displayHour = hour > 12 ? hour - 12 : hour;
+                      final label = '$displayHour:00 $suffix';
+
+                      return ChoiceChip(
+                        label: Text(label),
+                        selected: selected,
+                        onSelected: (_) {
+                          onUpdateReminderSettings(
+                            reminderSettings.copyWith(
+                              dailyCheckInHour: hour,
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Evening support reminder'),
+                  subtitle: const Text(
+                    'Daily 7:00 PM pause-first reminder.',
+                  ),
+                  value: reminderSettings.eveningSupportEnabled,
+                  onChanged: (value) {
+                    onUpdateReminderSettings(
+                      reminderSettings.copyWith(
+                        eveningSupportEnabled: value,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
 
 class _EditGoalScreen extends StatefulWidget {
   final String initialGoal;
@@ -670,14 +761,18 @@ class _EditGoalScreenState extends State<_EditGoalScreen> {
             runSpacing: 8,
             children: [
               ActionChip(
-                label: const Text('Stop the spiral before the next ticket'),
+                label: const Text(
+                  'Stop the spiral before the next ticket',
+                ),
                 onPressed: () {
                   _controller.text =
                       'Stop the spiral before the next ticket';
                 },
               ),
               ActionChip(
-                label: const Text('Cut lottery spending without white-knuckling it'),
+                label: const Text(
+                  'Cut lottery spending without white-knuckling it',
+                ),
                 onPressed: () {
                   _controller.text =
                       'Cut lottery spending without white-knuckling it';
