@@ -194,9 +194,11 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
   Widget build(BuildContext context) {
     const emotionalTags = <String>[
       'Stress',
+      'Anger',
       'Boredom',
       'Lonely',
       'Money pressure',
+      'Bad day',
       'After work',
       'Nighttime',
     ];
@@ -205,7 +207,10 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
       'After paycheck',
       'Saw a display',
       'Won recently',
+      'Near miss',
       'Passing a store',
+      'In the store',
+      'Want one',
       'Routine stop',
       'Store stop',
     ];
@@ -302,7 +307,7 @@ class _PurchaseLogSheetState extends State<PurchaseLogSheet> {
                 maxLines: 2,
                 decoration: const InputDecoration(
                   labelText: 'Optional note',
-                  hintText: 'After seeing tickets at checkout, felt stressed...',
+                  hintText: 'Angry after work, saw a display, wanted just one...',
                 ),
               ),
               const SizedBox(height: 16),
