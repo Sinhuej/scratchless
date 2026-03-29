@@ -32,14 +32,6 @@ class _RiskyPlacesScreenState extends State<RiskyPlacesScreen> {
     _places = List<RiskyPlace>.from(widget.places);
   }
 
-  @override
-  void didUpdateWidget(covariant RiskyPlacesScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.places != widget.places) {
-      _places = List<RiskyPlace>.from(widget.places);
-    }
-  }
 
   List<RiskyPlace> get _sortedPlaces {
     final items = [..._places];
