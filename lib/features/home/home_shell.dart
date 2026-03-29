@@ -4,6 +4,7 @@ import '../../app/app_theme.dart';
 import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/purchase_log.dart';
+import '../../core/models/risky_place.dart';
 import '../../core/models/reminder_settings.dart';
 import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
@@ -21,6 +22,7 @@ import '../help/help_screen.dart';
 import '../milestones/milestones_screen.dart';
 import '../pre_store/pre_store_mode_screen.dart';
 import '../profile/profile_screen.dart';
+import '../risky_places/risky_places_screen.dart';
 import '../reasons/reasons_screen.dart';
 import '../stats/stats_screen.dart';
 
@@ -43,6 +45,7 @@ class HomeShell extends StatefulWidget {
   final List<StopReason> stopReasons;
   final SpendCapPlan spendCapPlan;
   final SpendCapProgress spendCapProgress;
+  final List<RiskyPlace> riskyPlaces;
   final RiskyTimeInsight riskyTimeInsight;
   final bool showRiskyTimeWarningCard;
   final List<MilestoneCardData> milestoneItems;
@@ -61,6 +64,9 @@ class HomeShell extends StatefulWidget {
   final ValueChanged<StopReason> onEditStopReason;
   final void Function(String id) onDeleteStopReason;
   final ValueChanged<SpendCapPlan> onUpdateSpendCapPlan;
+  final ValueChanged<RiskyPlace> onAddRiskyPlace;
+  final ValueChanged<RiskyPlace> onEditRiskyPlace;
+  final void Function(String id) onDeleteRiskyPlace;
   final ValueChanged<String> onCelebrateMilestone;
   final ValueChanged<String> onUpdateGoal;
 
@@ -84,6 +90,7 @@ class HomeShell extends StatefulWidget {
     required this.stopReasons,
     required this.spendCapPlan,
     required this.spendCapProgress,
+    required this.riskyPlaces,
     required this.riskyTimeInsight,
     required this.showRiskyTimeWarningCard,
     required this.milestoneItems,
@@ -100,6 +107,9 @@ class HomeShell extends StatefulWidget {
     required this.onEditStopReason,
     required this.onDeleteStopReason,
     required this.onUpdateSpendCapPlan,
+    required this.onAddRiskyPlace,
+    required this.onEditRiskyPlace,
+    required this.onDeleteRiskyPlace,
     required this.onCelebrateMilestone,
     required this.onUpdateGoal,
   });
@@ -154,7 +164,9 @@ class _HomeShellState extends State<HomeShell> {
           onComplete: widget.onCompleteUrgeSession,
           onOpenCopingStrategies: _openCopingStrategies,
           onOpenAccountability: _openAccountability,
+          onOpenRiskyPlaces: _openRiskyPlaces,
           accountabilityPartner: widget.accountabilityPartner,
+          riskyPlaces: widget.riskyPlaces,
           weeklySummary: widget.weeklySummary,
           currentStreakDays: widget.currentStreakDays,
         ),
@@ -169,6 +181,19 @@ class _HomeShellState extends State<HomeShell> {
           items: widget.milestoneItems,
           celebrationReady: widget.celebrationReady,
           onCelebrateMilestone: widget.onCelebrateMilestone,
+        ),
+      ),
+    );
+  }
+
+  void _openRiskyPlaces() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => RiskyPlacesScreen(
+          places: widget.riskyPlaces,
+          onAddPlace: widget.onAddRiskyPlace,
+          onEditPlace: widget.onEditRiskyPlace,
+          onDeletePlace: widget.onDeleteRiskyPlace,
         ),
       ),
     );
@@ -218,6 +243,7 @@ class _HomeShellState extends State<HomeShell> {
         weeklySummary: widget.weeklySummary,
         spendCapPlan: widget.spendCapPlan,
         spendCapProgress: widget.spendCapProgress,
+        riskyPlaces: widget.riskyPlaces,
         riskyTimeInsight: widget.riskyTimeInsight,
         showRiskyTimeWarningCard: widget.showRiskyTimeWarningCard,
         accountabilityPartner: widget.accountabilityPartner,
@@ -272,6 +298,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenGoals: _openGoals,
         onOpenMilestones: _openMilestones,
         onOpenPreStoreMode: _openPreStoreMode,
+        onOpenRiskyPlaces: _openRiskyPlaces,
         onUpdateGoal: widget.onUpdateGoal,
       ),
     ];

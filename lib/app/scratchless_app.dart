@@ -4,6 +4,7 @@ import '../core/models/accountability_partner.dart';
 import '../core/models/milestone_state.dart';
 import '../core/models/premium_state.dart';
 import '../core/models/purchase_log.dart';
+import '../core/models/risky_place.dart';
 import '../core/models/reminder_settings.dart';
 import '../core/models/spend_cap_plan.dart';
 import '../core/models/stop_reason.dart';
@@ -48,6 +49,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       AccountabilityPartner.empty();
   List<StopReason> _stopReasons = <StopReason>[];
   SpendCapPlan _spendCapPlan = SpendCapPlan.defaults();
+  List<RiskyPlace> _riskyPlaces = <RiskyPlace>[];
   MilestoneState _milestoneState = MilestoneState.empty();
 
   @override
@@ -147,6 +149,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       _accountabilityPartner = stored.accountabilityPartner;
       _stopReasons = stored.stopReasons;
       _spendCapPlan = stored.spendCapPlan;
+      _riskyPlaces = stored.riskyPlaces;
       _milestoneState = stored.milestoneState;
     });
   }
@@ -168,6 +171,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
         accountabilityPartner: _accountabilityPartner,
         stopReasons: _stopReasons,
         spendCapPlan: _spendCapPlan,
+        riskyPlaces: _riskyPlaces,
         milestoneState: _milestoneState,
       ),
     );
@@ -367,6 +371,38 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
     _persistState();
   }
 
+  void _addRiskyPlace(RiskyPlace place) {
+    setState(() {
+      _riskyPlaces = [
+        place,
+        ..._riskyPlaces.where((item) => item.id != place.id),
+      ];
+    });
+
+    _persistState();
+  }
+
+  void _editRiskyPlace(RiskyPlace place) {
+    setState(() {
+      _riskyPlaces = _riskyPlaces.map((item) {
+        if (item.id != place.id) {
+          return item;
+        }
+        return place;
+      }).toList();
+    });
+
+    _persistState();
+  }
+
+  void _deleteRiskyPlace(String id) {
+    setState(() {
+      _riskyPlaces = _riskyPlaces.where((place) => place.id != id).toList();
+    });
+
+    _persistState();
+  }
+
   void _celebrateMilestone(String id) {
     if (_milestoneState.celebratedIds.contains(id)) {
       return;
@@ -412,6 +448,7 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   stopReasons: _stopReasons,
                   spendCapPlan: _spendCapPlan,
                   spendCapProgress: _spendCapProgress,
+                  riskyPlaces: _riskyPlaces,
                   riskyTimeInsight: _riskyTimeInsight,
                   showRiskyTimeWarningCard: _showRiskyTimeWarningCard,
                   milestoneItems: _milestoneItems,
@@ -428,6 +465,9 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   onEditStopReason: _editStopReason,
                   onDeleteStopReason: _deleteStopReason,
                   onUpdateSpendCapPlan: _updateSpendCapPlan,
+                  onAddRiskyPlace: _addRiskyPlace,
+                  onEditRiskyPlace: _editRiskyPlace,
+                  onDeleteRiskyPlace: _deleteRiskyPlace,
                   onCelebrateMilestone: _celebrateMilestone,
                   onUpdateGoal: _updateGoal,
                 )

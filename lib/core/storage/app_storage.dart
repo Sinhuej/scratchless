@@ -6,6 +6,7 @@ import '../models/accountability_partner.dart';
 import '../models/milestone_state.dart';
 import '../models/premium_state.dart';
 import '../models/purchase_log.dart';
+import '../models/risky_place.dart';
 import '../models/reminder_settings.dart';
 import '../models/spend_cap_plan.dart';
 import '../models/stop_reason.dart';
@@ -27,6 +28,7 @@ class StoredAppState {
   final AccountabilityPartner accountabilityPartner;
   final List<StopReason> stopReasons;
   final SpendCapPlan spendCapPlan;
+  final List<RiskyPlace> riskyPlaces;
   final MilestoneState milestoneState;
 
   const StoredAppState({
@@ -44,6 +46,7 @@ class StoredAppState {
     required this.accountabilityPartner,
     required this.stopReasons,
     required this.spendCapPlan,
+    required this.riskyPlaces,
     required this.milestoneState,
   });
 
@@ -63,6 +66,7 @@ class StoredAppState {
       accountabilityPartner: AccountabilityPartner.empty(),
       stopReasons: const <StopReason>[],
       spendCapPlan: SpendCapPlan.defaults(),
+      riskyPlaces: const <RiskyPlace>[],
       milestoneState: MilestoneState.empty(),
     );
   }
@@ -90,6 +94,7 @@ class AppStorage {
   static const String _accountabilityPartnerKey = 'accountability_partner';
   static const String _stopReasonsKey = 'stop_reasons';
   static const String _spendCapPlanKey = 'spend_cap_plan';
+  static const String _riskyPlacesKey = 'risky_places';
   static const String _milestoneStateKey = 'milestone_state';
 
   static Future<StoredAppState> load() async {
@@ -148,6 +153,12 @@ class AppStorage {
               jsonDecode(spendCapPlanRaw) as Map<String, dynamic>,
             );
 
+      final rawRiskyPlaces = prefs.getStringList(_riskyPlacesKey) ?? <String>[];
+      final riskyPlaces = rawRiskyPlaces.map((raw) {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        return RiskyPlace.fromJson(decoded);
+      }).toList();
+
       final milestoneStateRaw = prefs.getString(_milestoneStateKey);
       final milestoneState = milestoneStateRaw == null
           ? MilestoneState.empty()
@@ -182,6 +193,7 @@ class AppStorage {
         accountabilityPartner: accountabilityPartner,
         stopReasons: stopReasons,
         spendCapPlan: spendCapPlan,
+        riskyPlaces: riskyPlaces,
         milestoneState: milestoneState,
       );
     } catch (_) {
@@ -264,6 +276,11 @@ class AppStorage {
       _spendCapPlanKey,
       jsonEncode(state.spendCapPlan.toJson()),
     );
+
+    final encodedRiskyPlaces = state.riskyPlaces
+        .map((place) => jsonEncode(place.toJson()))
+        .toList();
+    await prefs.setStringList(_riskyPlacesKey, encodedRiskyPlaces);
 
     await prefs.setString(
       _milestoneStateKey,

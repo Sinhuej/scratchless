@@ -31,6 +31,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenGoals;
   final VoidCallback onOpenMilestones;
   final VoidCallback onOpenPreStoreMode;
+  final VoidCallback onOpenRiskyPlaces;
   final ValueChanged<String> onUpdateGoal;
 
   const ProfileScreen({
@@ -55,6 +56,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenGoals,
     required this.onOpenMilestones,
     required this.onOpenPreStoreMode,
+    required this.onOpenRiskyPlaces,
     required this.onUpdateGoal,
   });
 
@@ -175,6 +177,39 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'Use a fast intervention mode before the parking lot becomes a purchase.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenRiskyPlaces,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Risky places watchlist',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Save your danger-zone stops',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Keep a manual list of the stores and routes that tend to pull you toward tickets.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,

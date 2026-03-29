@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/app_theme.dart';
 import '../../core/models/accountability_partner.dart';
+import '../../core/models/risky_place.dart';
 import '../../core/services/accountability_message_service.dart';
 import '../../core/services/pre_store_intervention_service.dart';
 import '../../core/services/weekly_summary_service.dart';
@@ -15,7 +16,9 @@ class PreStoreModeScreen extends StatefulWidget {
   final VoidCallback onComplete;
   final VoidCallback onOpenCopingStrategies;
   final VoidCallback onOpenAccountability;
+  final VoidCallback onOpenRiskyPlaces;
   final AccountabilityPartner accountabilityPartner;
+  final List<RiskyPlace> riskyPlaces;
   final WeeklySummary weeklySummary;
   final int currentStreakDays;
 
@@ -24,7 +27,9 @@ class PreStoreModeScreen extends StatefulWidget {
     required this.onComplete,
     required this.onOpenCopingStrategies,
     required this.onOpenAccountability,
+    required this.onOpenRiskyPlaces,
     required this.accountabilityPartner,
+    required this.riskyPlaces,
     required this.weeklySummary,
     required this.currentStreakDays,
   });
@@ -88,6 +93,10 @@ class _PreStoreModeScreenState extends State<PreStoreModeScreen> {
 
     final hasTrustedPerson = widget.accountabilityPartner.hasName;
     final hasPhone = widget.accountabilityPartner.hasPhone;
+    final highlightedPlaces = [
+      ...widget.riskyPlaces.where((place) => place.isTopRisk),
+      ...widget.riskyPlaces.where((place) => !place.isTopRisk),
+    ].take(3).toList();
 
     final supportNowMessage =
         AccountabilityMessageService.buildSupportNowMessage(
@@ -295,6 +304,69 @@ class _PreStoreModeScreenState extends State<PreStoreModeScreen> {
                     },
                   ),
                 ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Risky places watchlist',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (highlightedPlaces.isEmpty)
+                  const Text(
+                    'No risky places saved yet. Add your common danger-zone stops so ScratchLess can keep them visible.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  )
+                else
+                  ...highlightedPlaces.map((place) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 5),
+                            child: Icon(
+                              Icons.location_on_rounded,
+                              size: 14,
+                              color: AppTheme.accent,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              place.isTopRisk
+                                  ? '${place.label} • Top risk'
+                                  : place.label,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: 'Open risky places watchlist',
+                  icon: Icons.place_rounded,
+                  isPrimary: false,
+                  onPressed: widget.onOpenRiskyPlaces,
+                ),
               ],
             ),
           ),
