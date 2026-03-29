@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/accountability_partner.dart';
 import '../../core/models/stop_reason.dart';
+import '../../core/services/accountability_message_service.dart';
 import '../../core/services/money_converter_service.dart';
+import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 
@@ -11,6 +16,10 @@ class UrgeModeScreen extends StatefulWidget {
   final VoidCallback onComplete;
   final VoidCallback onOpenCopingStrategies;
   final VoidCallback onOpenNearMissEducation;
+  final VoidCallback onOpenAccountability;
+  final AccountabilityPartner accountabilityPartner;
+  final WeeklySummary weeklySummary;
+  final int currentStreakDays;
   final List<StopReason> reasons;
 
   const UrgeModeScreen({
@@ -19,6 +28,10 @@ class UrgeModeScreen extends StatefulWidget {
     required this.onComplete,
     required this.onOpenCopingStrategies,
     required this.onOpenNearMissEducation,
+    required this.onOpenAccountability,
+    required this.accountabilityPartner,
+    required this.weeklySummary,
+    required this.currentStreakDays,
     required this.reasons,
   });
 
@@ -56,16 +69,64 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
     }
   }
 
+  Future<void> _copyText(String text, String confirmation) async {
+    await Clipboard.setData(ClipboardData(text: text));
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(confirmation),
+      ),
+    );
+  }
+
+  Future<void> _sendSmsOrCopy({
+    required String phone,
+    required String body,
+    required String copiedMessage,
+  }) async {
+    final uri = Uri(
+      scheme: 'sms',
+      path: phone,
+      queryParameters: <String, String>{
+        'body': body,
+      },
+    );
+
+    final ok = await launchUrl(uri);
+
+    if (!ok && mounted) {
+      await _copyText(body, copiedMessage);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final displayReasons = widget.reasons.isEmpty
         ? _starterReasons
         : widget.reasons.take(3).map((reason) => reason.text).toList();
 
-    final converterReport =
-        MoneyConverterService.build(widget.averageSpend);
-
+    final converterReport = MoneyConverterService.build(widget.averageSpend);
     final previewComparisons = converterReport.comparisons.take(3).toList();
+
+    final supportNowMessage =
+        AccountabilityMessageService.buildSupportNowMessage(
+      partnerName: widget.accountabilityPartner.name,
+    );
+
+    final quickCheckInMessage =
+        AccountabilityMessageService.buildCheckInMessage(
+      partnerName: widget.accountabilityPartner.name,
+      weeklySummary: widget.weeklySummary,
+      currentStreakDays: widget.currentStreakDays,
+    );
+
+    final hasTrustedPerson = widget.accountabilityPartner.hasName;
+    final hasPhone = widget.accountabilityPartner.hasPhone;
+    final partnerName = widget.accountabilityPartner.name.trim();
 
     return Scaffold(
       appBar: AppBar(
@@ -190,6 +251,116 @@ class _UrgeModeScreenState extends State<UrgeModeScreen> {
                       ),
                     );
                   }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Trusted-person quick check-in',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (!hasTrustedPerson) ...[
+                  const Text(
+                    'No trusted person set yet.',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Set one trusted person so urge mode can help you reach out faster when the risk spikes.',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Set up accountability',
+                    icon: Icons.person_add_alt_1_rounded,
+                    isPrimary: false,
+                    onPressed: widget.onOpenAccountability,
+                  ),
+                ] else ...[
+                  Text(
+                    partnerName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    hasPhone
+                        ? 'Reach out before buying. Fast contact is better than waiting for the urge to get louder.'
+                        : 'No phone is saved yet, but you can still copy a message and send it however you want.',
+                    style: const TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: hasPhone
+                        ? 'Text support request'
+                        : 'Copy support request',
+                    icon: Icons.support_agent_rounded,
+                    onPressed: () {
+                      if (hasPhone) {
+                        _sendSmsOrCopy(
+                          phone: widget.accountabilityPartner.phone!,
+                          body: supportNowMessage,
+                          copiedMessage:
+                              'Could not open texting. Support request copied.',
+                        );
+                      } else {
+                        _copyText(
+                          supportNowMessage,
+                          'Support request copied',
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  AppButton(
+                    label: hasPhone ? 'Text quick check-in' : 'Copy check-in',
+                    icon: Icons.sms_rounded,
+                    isPrimary: false,
+                    onPressed: () {
+                      if (hasPhone) {
+                        _sendSmsOrCopy(
+                          phone: widget.accountabilityPartner.phone!,
+                          body: quickCheckInMessage,
+                          copiedMessage:
+                              'Could not open texting. Check-in copied.',
+                        );
+                      } else {
+                        _copyText(
+                          quickCheckInMessage,
+                          'Check-in copied',
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: widget.onOpenAccountability,
+                      child: const Text('Open full accountability tools'),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/accountability_partner.dart';
 import '../../core/models/purchase_log.dart';
 import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
@@ -27,6 +28,7 @@ class DashboardScreen extends StatelessWidget {
   final WeeklySummary weeklySummary;
   final SpendCapPlan spendCapPlan;
   final SpendCapProgress spendCapProgress;
+  final AccountabilityPartner accountabilityPartner;
   final MilestoneCardData? celebrationReady;
   final void Function(double amount, String? note, List<String> tags)
       onLogPurchase;
@@ -39,6 +41,7 @@ class DashboardScreen extends StatelessWidget {
   final VoidCallback onOpenNearMissEducation;
   final VoidCallback onOpenGoals;
   final VoidCallback onOpenMilestones;
+  final VoidCallback onOpenAccountability;
   final ValueChanged<String> onCelebrateMilestone;
 
   const DashboardScreen({
@@ -55,6 +58,7 @@ class DashboardScreen extends StatelessWidget {
     required this.weeklySummary,
     required this.spendCapPlan,
     required this.spendCapProgress,
+    required this.accountabilityPartner,
     required this.celebrationReady,
     required this.onLogPurchase,
     required this.onEditPurchase,
@@ -65,6 +69,7 @@ class DashboardScreen extends StatelessWidget {
     required this.onOpenNearMissEducation,
     required this.onOpenGoals,
     required this.onOpenMilestones,
+    required this.onOpenAccountability,
     required this.onCelebrateMilestone,
   });
 
@@ -238,6 +243,10 @@ class DashboardScreen extends StatelessWidget {
                     onComplete: onCompleteUrgeSession,
                     onOpenCopingStrategies: onOpenCopingStrategies,
                     onOpenNearMissEducation: onOpenNearMissEducation,
+                    onOpenAccountability: onOpenAccountability,
+                    accountabilityPartner: accountabilityPartner,
+                    weeklySummary: weeklySummary,
+                    currentStreakDays: currentStreakDays,
                     reasons: reasons,
                   ),
                 ),

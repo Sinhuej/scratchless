@@ -195,6 +195,7 @@ class _HomeShellState extends State<HomeShell> {
         weeklySummary: widget.weeklySummary,
         spendCapPlan: widget.spendCapPlan,
         spendCapProgress: widget.spendCapProgress,
+        accountabilityPartner: widget.accountabilityPartner,
         celebrationReady: widget.celebrationReady,
         onLogPurchase: widget.onLogPurchase,
         onEditPurchase: widget.onEditPurchase,
@@ -205,6 +206,7 @@ class _HomeShellState extends State<HomeShell> {
         onOpenNearMissEducation: _openNearMissEducation,
         onOpenGoals: _openGoals,
         onOpenMilestones: _openMilestones,
+        onOpenAccountability: _openAccountability,
         onCelebrateMilestone: widget.onCelebrateMilestone,
       ),
       StatsScreen(
