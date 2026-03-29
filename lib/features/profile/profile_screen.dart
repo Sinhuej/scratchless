@@ -64,92 +64,12 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<void> _showEditGoalSheet(BuildContext context) async {
-    final controller = TextEditingController(text: goal);
-
-    final result = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              20,
-              16,
-              16 + MediaQuery.of(sheetContext).viewInsets.bottom,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Edit current focus',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Keep it short, honest, and useful for right now.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppTheme.mutedText,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller,
-                  maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Current focus',
-                    hintText: 'Stop the spiral before the next ticket',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ActionChip(
-                      label: const Text('Stop the spiral before the next ticket'),
-                      onPressed: () {
-                        controller.text =
-                            'Stop the spiral before the next ticket';
-                      },
-                    ),
-                    ActionChip(
-                      label: const Text('Cut lottery spending without white-knuckling it'),
-                      onPressed: () {
-                        controller.text =
-                            'Cut lottery spending without white-knuckling it';
-                      },
-                    ),
-                    ActionChip(
-                      label: const Text('Keep more cash for real life'),
-                      onPressed: () {
-                        controller.text = 'Keep more cash for real life';
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                AppButton(
-                  label: 'Save focus',
-                  icon: Icons.check_rounded,
-                  onPressed: () {
-                    FocusScope.of(sheetContext).unfocus();
-                    Navigator.of(sheetContext).pop(controller.text.trim());
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => _EditGoalScreen(initialGoal: goal),
+        fullscreenDialog: true,
+      ),
     );
-
-    controller.dispose();
 
     if (result == null) {
       return;
@@ -160,23 +80,15 @@ class ProfileScreen extends StatelessWidget {
       return;
     }
 
-    if (!context.mounted) {
-      return;
-    }
-
     onUpdateGoal(nextGoal);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!context.mounted) {
-        return;
-      }
-
+    if (context.mounted) {
       ScaffoldMessenger.maybeOf(context)?.showSnackBar(
         const SnackBar(
           content: Text('Current focus updated'),
         ),
       );
-    });
+    }
   }
 
   void _openPremiumScreen(BuildContext context) {
@@ -638,6 +550,101 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class _EditGoalScreen extends StatefulWidget {
+  final String initialGoal;
+
+  const _EditGoalScreen({
+    required this.initialGoal,
+  });
+
+  @override
+  State<_EditGoalScreen> createState() => _EditGoalScreenState();
+}
+
+class _EditGoalScreenState extends State<_EditGoalScreen> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialGoal);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    Navigator.of(context).pop(_controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit current focus'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text(
+            'Keep it short, honest, and useful for right now.',
+            style: TextStyle(
+              color: AppTheme.mutedText,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            maxLines: 2,
+            decoration: const InputDecoration(
+              labelText: 'Current focus',
+              hintText: 'Stop the spiral before the next ticket',
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ActionChip(
+                label: const Text('Stop the spiral before the next ticket'),
+                onPressed: () {
+                  _controller.text =
+                      'Stop the spiral before the next ticket';
+                },
+              ),
+              ActionChip(
+                label: const Text('Cut lottery spending without white-knuckling it'),
+                onPressed: () {
+                  _controller.text =
+                      'Cut lottery spending without white-knuckling it';
+                },
+              ),
+              ActionChip(
+                label: const Text('Keep more cash for real life'),
+                onPressed: () {
+                  _controller.text = 'Keep more cash for real life';
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          AppButton(
+            label: 'Save focus',
+            icon: Icons.check_rounded,
+            onPressed: _save,
           ),
         ],
       ),
