@@ -243,7 +243,6 @@ class _HomeShellState extends State<HomeShell> {
         weeklySummary: widget.weeklySummary,
         spendCapPlan: widget.spendCapPlan,
         spendCapProgress: widget.spendCapProgress,
-        riskyPlaces: widget.riskyPlaces,
         riskyTimeInsight: widget.riskyTimeInsight,
         showRiskyTimeWarningCard: widget.showRiskyTimeWarningCard,
         accountabilityPartner: widget.accountabilityPartner,
