@@ -224,7 +224,6 @@ class _HomeShellState extends State<HomeShell> {
         onOpenMilestones: _openMilestones,
         onOpenPreStoreMode: _openPreStoreMode,
         onOpenAccountability: _openAccountability,
-        onOpenPreStoreMode: _openPreStoreMode,
 
         onCelebrateMilestone: widget.onCelebrateMilestone,
       ),
