@@ -7,6 +7,7 @@ import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
 import '../../core/services/milestone_service.dart';
 import '../../core/services/spend_cap_service.dart';
+import '../../core/services/risky_time_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
@@ -28,6 +29,8 @@ class DashboardScreen extends StatelessWidget {
   final WeeklySummary weeklySummary;
   final SpendCapPlan spendCapPlan;
   final SpendCapProgress spendCapProgress;
+  final RiskyTimeInsight riskyTimeInsight;
+  final bool showRiskyTimeWarningCard;
   final AccountabilityPartner accountabilityPartner;
   final MilestoneCardData? celebrationReady;
   final void Function(double amount, String? note, List<String> tags)
@@ -59,6 +62,8 @@ class DashboardScreen extends StatelessWidget {
     required this.weeklySummary,
     required this.spendCapPlan,
     required this.spendCapProgress,
+    required this.riskyTimeInsight,
+    required this.showRiskyTimeWarningCard,
     required this.accountabilityPartner,
     required this.celebrationReady,
     required this.onLogPurchase,
@@ -176,6 +181,47 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+          if (showRiskyTimeWarningCard) ...[
+            const SizedBox(height: 12),
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Risky-time warning',
+                    style: TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    riskyTimeInsight.activeHeadline,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    riskyTimeInsight.activeBody,
+                    style: const TextStyle(
+                      color: AppTheme.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: 'Open pre-store mode',
+                    icon: Icons.directions_car_rounded,
+                    isPrimary: false,
+                    onPressed: onOpenPreStoreMode,
+                  ),
+                ],
+              ),
+            ),
+          ],
           if (celebrationReady != null) ...[
             const SizedBox(height: 12),
             AppCard(

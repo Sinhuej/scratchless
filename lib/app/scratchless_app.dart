@@ -11,6 +11,7 @@ import '../core/models/urge_session_log.dart';
 import '../core/models/weekly_reflection_archive_item.dart';
 import '../core/services/local_notification_service.dart';
 import '../core/services/milestone_service.dart';
+import '../core/services/risky_time_service.dart';
 import '../core/services/spend_cap_service.dart';
 import '../core/services/streak_service.dart';
 import '../core/services/weekly_reflection_service.dart';
@@ -94,6 +95,18 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
       logs: _logs,
       plan: _spendCapPlan,
     );
+  }
+
+  RiskyTimeInsight get _riskyTimeInsight {
+    return RiskyTimeService.build(
+      logs: _logs,
+    );
+  }
+
+  bool get _showRiskyTimeWarningCard {
+    return _reminderSettings.habitTimeWarningsEnabled &&
+        _riskyTimeInsight.hasEnoughData &&
+        _riskyTimeInsight.isActiveNow;
   }
 
   List<MilestoneCardData> get _milestoneItems {
@@ -399,6 +412,8 @@ class _ScratchLessAppState extends State<ScratchLessApp> {
                   stopReasons: _stopReasons,
                   spendCapPlan: _spendCapPlan,
                   spendCapProgress: _spendCapProgress,
+                  riskyTimeInsight: _riskyTimeInsight,
+                  showRiskyTimeWarningCard: _showRiskyTimeWarningCard,
                   milestoneItems: _milestoneItems,
                   celebrationReady: _celebrationReady,
                   onLogPurchase: _logPurchase,

@@ -4,6 +4,7 @@ import '../../app/app_theme.dart';
 import '../../core/models/accountability_partner.dart';
 import '../../core/models/premium_state.dart';
 import '../../core/models/reminder_settings.dart';
+import '../../core/services/risky_time_service.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../shared/widgets/app_button.dart';
 import '../urge/urge_scripts_screen.dart';
@@ -17,6 +18,7 @@ class ProfileScreen extends StatelessWidget {
   final int currentStreakDays;
   final int bestStreakDays;
   final ReminderSettings reminderSettings;
+  final RiskyTimeInsight riskyTimeInsight;
   final PremiumState premiumState;
   final AccountabilityPartner accountabilityPartner;
   final ValueChanged<ReminderSettings> onUpdateReminderSettings;
@@ -40,6 +42,7 @@ class ProfileScreen extends StatelessWidget {
     required this.currentStreakDays,
     required this.bestStreakDays,
     required this.reminderSettings,
+    required this.riskyTimeInsight,
     required this.premiumState,
     required this.accountabilityPartner,
     required this.onUpdateReminderSettings,
@@ -205,6 +208,54 @@ class ProfileScreen extends StatelessWidget {
                     color: AppTheme.mutedText,
                     fontSize: 14,
                   ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Risky-time nudges',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  riskyTimeInsight.hasEnoughData
+                      ? 'Detected window: ${riskyTimeInsight.windowLabel} (${riskyTimeInsight.anchorLabel})'
+                      : 'Not enough log data yet',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  riskyTimeInsight.profileSummary,
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Show habit-time warnings on Home'),
+                  subtitle: const Text('Surface a warning card near your harder hours.'),
+                  value: reminderSettings.habitTimeWarningsEnabled,
+                  onChanged: (value) {
+                    onUpdateReminderSettings(
+                      reminderSettings.copyWith(
+                        habitTimeWarningsEnabled: value,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

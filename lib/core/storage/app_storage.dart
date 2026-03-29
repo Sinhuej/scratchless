@@ -82,6 +82,7 @@ class AppStorage {
   static const String _dailyCheckInEnabledKey = 'daily_check_in_enabled';
   static const String _eveningSupportEnabledKey = 'evening_support_enabled';
   static const String _dailyCheckInHourKey = 'daily_check_in_hour';
+  static const String _habitTimeWarningsEnabledKey = 'habit_time_warnings_enabled';
 
   static const String _isPremiumKey = 'is_premium';
   static const String _trialStartedAtKey = 'trial_started_at';
@@ -169,6 +170,8 @@ class AppStorage {
               prefs.getBool(_eveningSupportEnabledKey) ?? false,
           dailyCheckInHour:
               prefs.getInt(_dailyCheckInHourKey) ?? 20,
+          habitTimeWarningsEnabled:
+              prefs.getBool(_habitTimeWarningsEnabledKey) ?? false,
         ),
         urgeSessions: urgeSessions,
         premiumState: PremiumState(
@@ -230,6 +233,10 @@ class AppStorage {
     await prefs.setInt(
       _dailyCheckInHourKey,
       state.reminderSettings.dailyCheckInHour,
+    );
+    await prefs.setBool(
+      _habitTimeWarningsEnabledKey,
+      state.reminderSettings.habitTimeWarningsEnabled,
     );
 
     await prefs.setBool(_isPremiumKey, state.premiumState.isPremium);

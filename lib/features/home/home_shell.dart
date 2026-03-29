@@ -9,6 +9,7 @@ import '../../core/models/spend_cap_plan.dart';
 import '../../core/models/stop_reason.dart';
 import '../../core/models/weekly_reflection_archive_item.dart';
 import '../../core/services/milestone_service.dart';
+import '../../core/services/risky_time_service.dart';
 import '../../core/services/spend_cap_service.dart';
 import '../../core/services/weekly_summary_service.dart';
 import '../accountability/accountability_screen.dart';
@@ -42,6 +43,8 @@ class HomeShell extends StatefulWidget {
   final List<StopReason> stopReasons;
   final SpendCapPlan spendCapPlan;
   final SpendCapProgress spendCapProgress;
+  final RiskyTimeInsight riskyTimeInsight;
+  final bool showRiskyTimeWarningCard;
   final List<MilestoneCardData> milestoneItems;
   final MilestoneCardData? celebrationReady;
   final void Function(double amount, String? note, List<String> tags)
@@ -81,6 +84,8 @@ class HomeShell extends StatefulWidget {
     required this.stopReasons,
     required this.spendCapPlan,
     required this.spendCapProgress,
+    required this.riskyTimeInsight,
+    required this.showRiskyTimeWarningCard,
     required this.milestoneItems,
     required this.celebrationReady,
     required this.onLogPurchase,
@@ -213,6 +218,8 @@ class _HomeShellState extends State<HomeShell> {
         weeklySummary: widget.weeklySummary,
         spendCapPlan: widget.spendCapPlan,
         spendCapProgress: widget.spendCapProgress,
+        riskyTimeInsight: widget.riskyTimeInsight,
+        showRiskyTimeWarningCard: widget.showRiskyTimeWarningCard,
         accountabilityPartner: widget.accountabilityPartner,
         celebrationReady: widget.celebrationReady,
         onLogPurchase: widget.onLogPurchase,
@@ -254,6 +261,7 @@ class _HomeShellState extends State<HomeShell> {
         reminderSettings: widget.reminderSettings,
         premiumState: widget.premiumState,
         accountabilityPartner: widget.accountabilityPartner,
+        riskyTimeInsight: widget.riskyTimeInsight,
         onUpdateReminderSettings: widget.onUpdateReminderSettings,
         onStartPremiumTrial: widget.onStartPremiumTrial,
         onOpenHelp: _openHelp,
