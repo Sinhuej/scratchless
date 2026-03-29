@@ -5,7 +5,7 @@ import '../../core/models/risky_place.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_card.dart';
 
-class RiskyPlacesScreen extends StatelessWidget {
+class RiskyPlacesScreen extends StatefulWidget {
   final List<RiskyPlace> places;
   final ValueChanged<RiskyPlace> onAddPlace;
   final ValueChanged<RiskyPlace> onEditPlace;
@@ -19,8 +19,30 @@ class RiskyPlacesScreen extends StatelessWidget {
     required this.onDeletePlace,
   });
 
+  @override
+  State<RiskyPlacesScreen> createState() => _RiskyPlacesScreenState();
+}
+
+class _RiskyPlacesScreenState extends State<RiskyPlacesScreen> {
+  late List<RiskyPlace> _places;
+
+  @override
+  void initState() {
+    super.initState();
+    _places = List<RiskyPlace>.from(widget.places);
+  }
+
+  @override
+  void didUpdateWidget(covariant RiskyPlacesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.places != widget.places) {
+      _places = List<RiskyPlace>.from(widget.places);
+    }
+  }
+
   List<RiskyPlace> get _sortedPlaces {
-    final items = [...places];
+    final items = [..._places];
     items.sort((a, b) {
       if (a.isTopRisk == b.isTopRisk) {
         return a.label.toLowerCase().compareTo(b.label.toLowerCase());
@@ -38,13 +60,20 @@ class RiskyPlacesScreen extends StatelessWidget {
       ),
     );
 
-    if (result == null) {
+    if (result == null || result.savedPlace == null) {
       return;
     }
 
-    if (result.savedPlace != null) {
-      onAddPlace(result.savedPlace!);
-    }
+    final place = result.savedPlace!;
+
+    setState(() {
+      _places = [
+        place,
+        ..._places.where((item) => item.id != place.id),
+      ];
+    });
+
+    widget.onAddPlace(place);
   }
 
   Future<void> _openEditPlace(BuildContext context, RiskyPlace place) async {
@@ -60,12 +89,29 @@ class RiskyPlacesScreen extends StatelessWidget {
     }
 
     if (result.deletedId != null) {
-      onDeletePlace(result.deletedId!);
+      final deletedId = result.deletedId!;
+
+      setState(() {
+        _places = _places.where((item) => item.id != deletedId).toList();
+      });
+
+      widget.onDeletePlace(deletedId);
       return;
     }
 
     if (result.savedPlace != null) {
-      onEditPlace(result.savedPlace!);
+      final updatedPlace = result.savedPlace!;
+
+      setState(() {
+        _places = _places.map((item) {
+          if (item.id != updatedPlace.id) {
+            return item;
+          }
+          return updatedPlace;
+        }).toList();
+      });
+
+      widget.onEditPlace(updatedPlace);
     }
   }
 
