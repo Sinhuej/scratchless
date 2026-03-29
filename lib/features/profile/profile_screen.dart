@@ -138,6 +138,7 @@ class ProfileScreen extends StatelessWidget {
                   label: 'Save focus',
                   icon: Icons.check_rounded,
                   onPressed: () {
+                    FocusScope.of(sheetContext).unfocus();
                     Navigator.of(sheetContext).pop(controller.text.trim());
                   },
                 ),
@@ -159,15 +160,23 @@ class ProfileScreen extends StatelessWidget {
       return;
     }
 
+    if (!context.mounted) {
+      return;
+    }
+
     onUpdateGoal(nextGoal);
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
         const SnackBar(
           content: Text('Current focus updated'),
         ),
       );
-    }
+    });
   }
 
   void _openPremiumScreen(BuildContext context) {
