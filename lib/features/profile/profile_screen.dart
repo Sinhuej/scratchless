@@ -27,6 +27,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenNearMissEducation;
   final VoidCallback onOpenGoals;
   final VoidCallback onOpenMilestones;
+  final VoidCallback onOpenPreStoreMode;
 
   const ProfileScreen({
     super.key,
@@ -48,6 +49,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenNearMissEducation,
     required this.onOpenGoals,
     required this.onOpenMilestones,
+    required this.onOpenPreStoreMode,
   });
 
   void _openUrgeScriptsScreen(BuildContext context) {
@@ -102,6 +104,39 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'Open your milestone list and reinforce the wins you have actually earned.',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AppCard(
+            onTap: onOpenPreStoreMode,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pre-store mode',
+                  style: TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Interrupt it before the stop',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Use a fast intervention mode before the parking lot becomes a purchase.',
                   style: TextStyle(
                     color: AppTheme.mutedText,
                     fontSize: 14,

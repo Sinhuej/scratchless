@@ -42,6 +42,7 @@ class DashboardScreen extends StatelessWidget {
   final VoidCallback onOpenGoals;
   final VoidCallback onOpenMilestones;
   final VoidCallback onOpenAccountability;
+  final VoidCallback onOpenPreStoreMode;
   final ValueChanged<String> onCelebrateMilestone;
 
   const DashboardScreen({
@@ -70,6 +71,7 @@ class DashboardScreen extends StatelessWidget {
     required this.onOpenGoals,
     required this.onOpenMilestones,
     required this.onOpenAccountability,
+    required this.onOpenPreStoreMode,
     required this.onCelebrateMilestone,
   });
 
@@ -254,6 +256,13 @@ class DashboardScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 14),
+          AppButton(
+            label: 'Pre-store mode',
+            isPrimary: false,
+            icon: Icons.directions_car_rounded,
+            onPressed: onOpenPreStoreMode,
+          ),
+          const SizedBox(height: 10),
           AppButton(
             label: 'Log a scratch-off',
             isPrimary: false,

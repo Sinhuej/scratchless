@@ -18,6 +18,7 @@ import '../education/near_miss_screen.dart';
 import '../goals/goals_screen.dart';
 import '../help/help_screen.dart';
 import '../milestones/milestones_screen.dart';
+import '../pre_store/pre_store_mode_screen.dart';
 import '../profile/profile_screen.dart';
 import '../reasons/reasons_screen.dart';
 import '../stats/stats_screen.dart';
@@ -139,6 +140,21 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  void _openPreStoreMode() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PreStoreModeScreen(
+          onComplete: widget.onCompleteUrgeSession,
+          onOpenCopingStrategies: _openCopingStrategies,
+          onOpenAccountability: _openAccountability,
+          accountabilityPartner: widget.accountabilityPartner,
+          weeklySummary: widget.weeklySummary,
+          currentStreakDays: widget.currentStreakDays,
+        ),
+      ),
+    );
+  }
+
   void _openMilestones() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -206,7 +222,9 @@ class _HomeShellState extends State<HomeShell> {
         onOpenNearMissEducation: _openNearMissEducation,
         onOpenGoals: _openGoals,
         onOpenMilestones: _openMilestones,
+        onOpenPreStoreMode: _openPreStoreMode,
         onOpenAccountability: _openAccountability,
+        onOpenPreStoreMode: _openPreStoreMode,
         onCelebrateMilestone: widget.onCelebrateMilestone,
       ),
       StatsScreen(
